@@ -1,0 +1,37 @@
+---
+editor: 
+  markdown: 
+    wrap: 72
+---
+
+# Welcome {.unnumbered}
+
+Bienvenidos, en este artículo te presento algunos modelos tradicionales,
+modernos y conceptos fundamentales para que te encamines al mundo del
+*Credit Scoring.* Existen algunas definiciones para Credit Scoring; sin
+embargo, en este trabajo, se considera a un credit scoring como un
+conjunto de metodologías que permitan evidenciar la probabilidad que un
+cliente cumpla o no con sus obligaciones, a partir de la información que
+se conozca del mismo. Estos modelos tienen muchas funciones dentro del
+ciclo de vida de un crédito que comprende el otorgamiento, seguimiento,
+cobranza y recuperación; sin embargo, este artículo se enfocará en las
+metodologías que sirven de apoyo, en la toma de decisiones del proceso
+de otorgamiento de créditos; tales metodologías deben permitir medir los
+riesgos de los potenciales clientes, a fin de precisar quienen podrían
+ser sujetos de crédito, estableciendo variables significativas que
+ayudan a identificar los individuos cuyo riesgo se ajuste al perfil de
+riesgo de la institución.
+
+Welcome, in this article we present some traditional and modern models
+and fundamental concepts to guide you into the world of Credit Scoring.
+There are a few definitions for Credit Scoring; However, in this work,
+credit scoring is considereded as a set of methodologies that allow us
+to demonstrate the probability that a client meets or does not comply
+with its obligations, based on the information known about it. These
+models have many functions within the life cycle of a loan that includes
+granting, monitoring, collection and recovery; However, this article
+will focus on the methodologies that serve as support in decision making
+in the credit granting process; such methodologies must allow measuring
+the risks of potential clients, in order to specify who could be subject
+to credit, establishing significant variables that help identify
+individuals whose risk fits the institution's risk profile.

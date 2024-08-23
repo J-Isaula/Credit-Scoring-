@@ -1,0 +1,9 @@
+# Preface {.unnumbered}
+
+##  {.unnumbered}
+
+En el proceso de otorgamiento de créditos, una institución no puede tomar decisiones a partir de su juicio de experto para cada una de las solicitudes recibidas, pues con el aumento en el número de solicitantes y la competencia intensa en la industria crediticia, este método no puede satisfacer las demandas en los aspectos economicos y de eficiencia [@Yu]; sino que intentará adoptar sistemas de calificación de créditos para facilitar y acelerar los procesos en la toma de decisiones. Por tal motivo, nace el concepto de modelos de ***Credit Scoring*** o modelos de calificación de créditos [@Islam].
+
+Muchos algoritmos son usados para la construcción de un credit scoring, sin embargo, cada vez se deberá buscar alternativas más efectivas para tomar decisiones más precisas, por ejemplo, las redes neuronales [@Islam].
+
+Son muchos los factores que pueden incidir en el crecimiento de la cartera vencida o el incremento de la mora de una cartera, como malas prácticas en la concesión de créditos, metas de crédito agresivas por parte de la institución, deterioro del empleo, recesión ecónomica, etc. Sin embargo, el anterior escenario evidencia la necesidad de contar con nuevas herramientas para la gestión de riesgo de crédito que ayuden a minimizar la probabilidad de pérdida de una institución, buscando alcanzar la eficiencia de la gestión de riesgos a partir de mejores herramientas estadísticas e informáticas.

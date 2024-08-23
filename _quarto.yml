@@ -1,0 +1,61 @@
+project:
+  type: book
+  output-dir: docs
+  resources:
+    - CNAME
+    - tlf/
+    - slides/
+
+book:
+  title: "Credit Scoring"
+  author:
+    - Juan Isaula
+  sidebar:
+    logo: "assets/mifoto.jpeg"
+    search: true
+
+  description: |
+    En este artículo, te llevo a conocer la literatura matemática sobre modelos de credit scoring,
+    te presento el detalle sobre el modelo regresión logística y redes neuronales,
+    adicional a ello te detallo las diferentes técnicas empleadas para la validación
+    de estos modelos. Si laboras en la banca, actuaría, estadística, economía o
+    data sciencs este artículo es para ti.
+
+  output-file: "r4csr"
+
+  cover-image: "assets/logo2.png"
+  image: "assets/ji.png"
+  favicon: "assets/ji.png"
+
+  site-url: https://j-isaula.github.io/website_ji/
+  repo-url: https://github.com/J-Isaula
+  sharing: [twitter, linkedin]
+  reader-mode: true
+
+  chapters:
+    - index.qmd
+    - preface.qmd
+    - modelos.qmd
+    - modelizacion.qmd
+
+
+    - references.qmd
+
+bibliography: references.bib
+
+format:
+  html:
+    theme: [cosmo, custom.scss]
+    # "Invention, system-ui, -apple-system, Segoe UI, Roboto, Helvetica Neue, Noto Sans, Liberation Sans, Arial, sans-serif, Apple Color Emoji, Segoe UI Emoji, Segoe UI Symbol, Noto Color Emoji"
+    code-link: true
+  pdf:
+    documentclass: tex/svmono
+    include-in-header:
+      - "tex/preamble.tex"
+    include-before-body:
+      - "tex/before_body.tex"
+    include-after-body:
+      - "tex/after_body.tex"
+    cite-method: natbib
+    keep-tex: true
+    toc: true

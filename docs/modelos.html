@@ -1,0 +1,1077 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en"><head>
+
+<meta charset="utf-8">
+<meta name="generator" content="quarto-1.4.555">
+
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+
+<meta name="description" content="En este artículo, te llevo a conocer la literatura matemática sobre modelos de credit scoring, te presento el detalle sobre el modelo regresión logística y redes neuronales, adicional a ello te detallo las diferentes técnicas empleadas para la validación de estos modelos. Si laboras en la banca, actuaría, estadística, economía o data sciencs este artículo es para ti.">
+
+<title>Credit Scoring - 1&nbsp; Modelos Credit Scoring</title>
+<style>
+code{white-space: pre-wrap;}
+span.smallcaps{font-variant: small-caps;}
+div.columns{display: flex; gap: min(4vw, 1.5em);}
+div.column{flex: auto; overflow-x: auto;}
+div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+ul.task-list{list-style: none;}
+ul.task-list li input[type="checkbox"] {
+  width: 0.8em;
+  margin: 0 0.8em 0.2em -1em; /* quarto-specific, see https://github.com/quarto-dev/quarto-cli/issues/4556 */ 
+  vertical-align: middle;
+}
+/* CSS for citations */
+div.csl-bib-body { }
+div.csl-entry {
+  clear: both;
+  margin-bottom: 0em;
+}
+.hanging-indent div.csl-entry {
+  margin-left:2em;
+  text-indent:-2em;
+}
+div.csl-left-margin {
+  min-width:2em;
+  float:left;
+}
+div.csl-right-inline {
+  margin-left:2em;
+  padding-left:1em;
+}
+div.csl-indent {
+  margin-left: 2em;
+}</style>
+
+
+<script src="site_libs/quarto-nav/quarto-nav.js"></script>
+<script src="site_libs/quarto-nav/headroom.min.js"></script>
+<script src="site_libs/clipboard/clipboard.min.js"></script>
+<script src="site_libs/quarto-search/autocomplete.umd.js"></script>
+<script src="site_libs/quarto-search/fuse.min.js"></script>
+<script src="site_libs/quarto-search/quarto-search.js"></script>
+<meta name="quarto:offset" content="./">
+<link href="./modelizacion.html" rel="next">
+<link href="./preface.html" rel="prev">
+<link href="./assets/ji.png" rel="icon" type="image/png">
+<script src="site_libs/quarto-html/quarto.js"></script>
+<script src="site_libs/quarto-html/popper.min.js"></script>
+<script src="site_libs/quarto-html/tippy.umd.min.js"></script>
+<script src="site_libs/quarto-html/anchor.min.js"></script>
+<link href="site_libs/quarto-html/tippy.css" rel="stylesheet">
+<link href="site_libs/quarto-html/quarto-syntax-highlighting.css" rel="stylesheet" id="quarto-text-highlighting-styles">
+<script src="site_libs/bootstrap/bootstrap.min.js"></script>
+<link href="site_libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
+<link href="site_libs/bootstrap/bootstrap.min.css" rel="stylesheet" id="quarto-bootstrap" data-mode="light">
+<script id="quarto-search-options" type="application/json">{
+  "location": "sidebar",
+  "copy-button": false,
+  "collapse-after": 3,
+  "panel-placement": "start",
+  "type": "textbox",
+  "limit": 50,
+  "keyboard-shortcut": [
+    "f",
+    "/",
+    "s"
+  ],
+  "show-item-context": false,
+  "language": {
+    "search-no-results-text": "No results",
+    "search-matching-documents-text": "matching documents",
+    "search-copy-link-title": "Copy link to search",
+    "search-hide-matches-text": "Hide additional matches",
+    "search-more-match-text": "more match in this document",
+    "search-more-matches-text": "more matches in this document",
+    "search-clear-button-title": "Clear",
+    "search-text-placeholder": "",
+    "search-detached-cancel-button-title": "Cancel",
+    "search-submit-button-title": "Submit",
+    "search-label": "Search"
+  }
+}</script>
+
+  <script src="https://polyfill.io/v3/polyfill.min.js?features=es6"></script>
+  <script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml-full.js" type="text/javascript"></script>
+
+<script type="text/javascript">
+const typesetMath = (el) => {
+  if (window.MathJax) {
+    // MathJax Typeset
+    window.MathJax.typeset([el]);
+  } else if (window.katex) {
+    // KaTeX Render
+    var mathElements = el.getElementsByClassName("math");
+    var macros = [];
+    for (var i = 0; i < mathElements.length; i++) {
+      var texText = mathElements[i].firstChild;
+      if (mathElements[i].tagName == "SPAN") {
+        window.katex.render(texText.data, mathElements[i], {
+          displayMode: mathElements[i].classList.contains('display'),
+          throwOnError: false,
+          macros: macros,
+          fleqn: false
+        });
+      }
+    }
+  }
+}
+window.Quarto = {
+  typesetMath
+};
+</script>
+
+</head>
+
+<body class="nav-sidebar floating">
+
+<div id="quarto-search-results"></div>
+  <header id="quarto-header" class="headroom fixed-top">
+  <nav class="quarto-secondary-nav">
+    <div class="container-fluid d-flex">
+      <button type="button" class="quarto-btn-toggle btn" data-bs-toggle="collapse" data-bs-target=".quarto-sidebar-collapse-item" aria-controls="quarto-sidebar" aria-expanded="false" aria-label="Toggle sidebar navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">
+        <i class="bi bi-layout-text-sidebar-reverse"></i>
+      </button>
+        <nav class="quarto-page-breadcrumbs" aria-label="breadcrumb"><ol class="breadcrumb"><li class="breadcrumb-item"><a href="./modelos.html"><span class="chapter-number">1</span>&nbsp; <span class="chapter-title">Modelos Credit Scoring</span></a></li></ol></nav>
+        <a class="flex-grow-1" role="button" data-bs-toggle="collapse" data-bs-target=".quarto-sidebar-collapse-item" aria-controls="quarto-sidebar" aria-expanded="false" aria-label="Toggle sidebar navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">      
+        </a>
+      <button type="button" class="btn quarto-search-button" aria-label="" onclick="window.quartoOpenSearch();">
+        <i class="bi bi-search"></i>
+      </button>
+    </div>
+  </nav>
+</header>
+<!-- content -->
+<div id="quarto-content" class="quarto-container page-columns page-rows-contents page-layout-article">
+<!-- sidebar -->
+  <nav id="quarto-sidebar" class="sidebar collapse collapse-horizontal quarto-sidebar-collapse-item sidebar-navigation floating overflow-auto">
+    <div class="pt-lg-2 mt-2 text-left sidebar-header sidebar-header-stacked">
+      <a href="./index.html" class="sidebar-logo-link">
+      <img src="./assets/mifoto.jpeg" alt="" class="sidebar-logo py-0 d-lg-inline d-none">
+      </a>
+    <div class="sidebar-title mb-0 py-0">
+      <a href="./">Credit Scoring</a> 
+        <div class="sidebar-tools-main tools-wide">
+    <a href="https://github.com/J-Isaula" title="Source Code" class="quarto-navigation-tool px-1" aria-label="Source Code"><i class="bi bi-github"></i></a>
+    <div class="dropdown">
+      <a href="" title="Share" id="quarto-navigation-tool-dropdown-0" class="quarto-navigation-tool dropdown-toggle px-1" data-bs-toggle="dropdown" aria-expanded="false" aria-label="Share"><i class="bi bi-share"></i></a>
+      <ul class="dropdown-menu" aria-labelledby="quarto-navigation-tool-dropdown-0">
+          <li>
+            <a class="dropdown-item sidebar-tools-main-item" href="https://twitter.com/intent/tweet?url=|url|">
+              <i class="bi bi-bi-twitter pe-1"></i>
+            Twitter
+            </a>
+          </li>
+          <li>
+            <a class="dropdown-item sidebar-tools-main-item" href="https://www.linkedin.com/sharing/share-offsite/?url=|url|">
+              <i class="bi bi-bi-linkedin pe-1"></i>
+            LinkedIn
+            </a>
+          </li>
+      </ul>
+    </div>
+  <a href="" class="quarto-reader-toggle quarto-navigation-tool px-1" onclick="window.quartoToggleReader(); return false;" title="Toggle reader mode">
+  <div class="quarto-reader-toggle-btn">
+  <i class="bi"></i>
+  </div>
+</a>
+</div>
+    </div>
+      </div>
+        <div class="mt-2 flex-shrink-0 align-items-center">
+        <div class="sidebar-search">
+        <div id="quarto-search" class="" title="Search"></div>
+        </div>
+        </div>
+    <div class="sidebar-menu-container"> 
+    <ul class="list-unstyled mt-1">
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./index.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Welcome</span></a>
+  </div>
+</li>
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./preface.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Preface</span></a>
+  </div>
+</li>
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./modelos.html" class="sidebar-item-text sidebar-link active">
+ <span class="menu-text"><span class="chapter-number">1</span>&nbsp; <span class="chapter-title">Modelos Credit Scoring</span></span></a>
+  </div>
+</li>
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./modelizacion.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">2</span>&nbsp; <span class="chapter-title">Conceptos del Proceso de Modelización</span></span></a>
+  </div>
+</li>
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./references.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">References</span></a>
+  </div>
+</li>
+    </ul>
+    </div>
+</nav>
+<div id="quarto-sidebar-glass" class="quarto-sidebar-collapse-item" data-bs-toggle="collapse" data-bs-target=".quarto-sidebar-collapse-item"></div>
+<!-- margin-sidebar -->
+    <div id="quarto-margin-sidebar" class="sidebar margin-sidebar">
+        <nav id="TOC" role="doc-toc" class="toc-active">
+    <h2 id="toc-title">Table of contents</h2>
+   
+  <ul>
+  <li><a href="#modelo-de-regresión-logística---logit" id="toc-modelo-de-regresión-logística---logit" class="nav-link active" data-scroll-target="#modelo-de-regresión-logística---logit"><span class="header-section-number">1.1</span> Modelo de Regresión Logística - Logit</a>
+  <ul class="collapse">
+  <li><a href="#estimación-de-los-parámetros-del-modelo-logit" id="toc-estimación-de-los-parámetros-del-modelo-logit" class="nav-link" data-scroll-target="#estimación-de-los-parámetros-del-modelo-logit"><span class="header-section-number">1.1.1</span> Estimación de los parámetros del modelo logit</a></li>
+  <li><a href="#interpretación-coeficientes-de-una-regresión-logística" id="toc-interpretación-coeficientes-de-una-regresión-logística" class="nav-link" data-scroll-target="#interpretación-coeficientes-de-una-regresión-logística"><span class="header-section-number">1.1.2</span> Interpretación coeficientes de una regresión logística</a></li>
+  </ul></li>
+  <li><a href="#modelo-de-redes-neuronales" id="toc-modelo-de-redes-neuronales" class="nav-link" data-scroll-target="#modelo-de-redes-neuronales"><span class="header-section-number">1.2</span> Modelo de Redes Neuronales</a>
+  <ul class="collapse">
+  <li><a href="#modelo-biológico" id="toc-modelo-biológico" class="nav-link" data-scroll-target="#modelo-biológico"><span class="header-section-number">1.2.1</span> Modelo Biológico</a></li>
+  <li><a href="#elementos-de-una-red-neuronal-artificial" id="toc-elementos-de-una-red-neuronal-artificial" class="nav-link" data-scroll-target="#elementos-de-una-red-neuronal-artificial"><span class="header-section-number">1.2.2</span> Elementos de una red neuronal artificial</a></li>
+  <li><a href="#arquitectura-de-las-redes-neuronales" id="toc-arquitectura-de-las-redes-neuronales" class="nav-link" data-scroll-target="#arquitectura-de-las-redes-neuronales"><span class="header-section-number">1.2.3</span> Arquitectura de las redes neuronales</a></li>
+  <li><a href="#modos-de-operación-de-una-red-neuronal" id="toc-modos-de-operación-de-una-red-neuronal" class="nav-link" data-scroll-target="#modos-de-operación-de-una-red-neuronal"><span class="header-section-number">1.2.4</span> Modos de operación de una red neuronal</a></li>
+  <li><a href="#clasificación-de-los-modelos-neuronales" id="toc-clasificación-de-los-modelos-neuronales" class="nav-link" data-scroll-target="#clasificación-de-los-modelos-neuronales"><span class="header-section-number">1.2.5</span> Clasificación de los modelos neuronales</a></li>
+  <li><a href="#algoritmo-backpropagation" id="toc-algoritmo-backpropagation" class="nav-link" data-scroll-target="#algoritmo-backpropagation"><span class="header-section-number">1.2.6</span> Algoritmo Backpropagation</a></li>
+  <li><a href="#algoritmo-rprop" id="toc-algoritmo-rprop" class="nav-link" data-scroll-target="#algoritmo-rprop"><span class="header-section-number">1.2.7</span> Algoritmo RPROP+</a></li>
+  </ul></li>
+  </ul>
+</nav>
+    </div>
+<!-- main -->
+<main class="content" id="quarto-document-content">
+
+<header id="title-block-header" class="quarto-title-block default">
+<div class="quarto-title">
+<h1 class="title"><span class="chapter-number">1</span>&nbsp; <span class="chapter-title">Modelos Credit Scoring</span></h1>
+</div>
+
+
+
+<div class="quarto-title-meta">
+
+    
+  
+    
+  </div>
+  
+
+
+</header>
+
+
+<p>Los modelos credit Scoring son algoritmos o métodos que pueden ayudar a obtener la probabilidad de incumplimiento de un solicitante de crédito, permitiendo evaluar el riesgo en el origen de la financiación <span class="citation" data-cites="Gutierrez">(<a href="references.html#ref-Gutierrez" role="doc-biblioref">Gutierrez Girault 2007</a>)</span>.</p>
+<p>El objetivo principal de estos modelos es estimar la probabilidad de incumplimiento de un solicitante de crédito; para esto es necesario contar con una variable que identifique si el solicitante es un buen o mal cliente, esta variable será represantada con la letra <span class="math inline">\(\textbf{Y}\)</span>, que es la variable dependiente del modelo.</p>
+<p>La variable dependiente es una variable dicotómica (binaria) que toma los siguientes valores:</p>
+<p><span class="math display">\[
+Y = \left \{
+\begin{array}{rr}
+1 &amp;: \mbox{Si el solicitante de crédito es definido como un buen cliente}\\
+0 &amp;: \mbox{Si el solicitante de crédito es definido como un mal cliente}\\
+\end{array}
+\right. \hspace{1.5cm} (1)
+\]</span></p>
+<p>La definición para la variable dependiente <span class="math inline">\(\textbf{Y}\)</span>, es construida a partir de información demográfica, comportamiento en el buró y/o dentro de la institución.</p>
+<p>Los modelos buscan estimar la probabilidad que la variable dependiente <span class="math inline">\(\textbf{Y}\)</span> tome el valor de 0 o 1, a partir de un conjunto de variables denominadas independientes, las cuales serán representadas con la letra <span class="math inline">\(\textbf{X}\)</span>, que puede ser cualitativas o cuantitativas. Las variables independientes son obtenidas a partir de diversas fuentes de información crediticia, buró, demográfica, etc. Muchas de las cuales dependerán de las características del crédito que se esté considerando.</p>
+<section id="modelo-de-regresión-logística---logit" class="level2" data-number="1.1">
+<h2 data-number="1.1" class="anchored" data-anchor-id="modelo-de-regresión-logística---logit"><span class="header-section-number">1.1</span> Modelo de Regresión Logística - Logit</h2>
+<p>Los modelos logit pertenecen al grupo jde modelos de regresión con respuesta cualitativa, en este caso binaria; mientras que las variables independientes pueden ser cualitativas o cuantitativas, o una mezcla de ambas <span class="citation" data-cites="Flórez">(<a href="references.html#ref-Flórez" role="doc-biblioref">Flórez 2002</a>)</span>.</p>
+<p>El modelo está basado en una función de distribución logística, cuya estructura se presenta a continuación:</p>
+<p><span class="math display">\[
+P(Y = 1 | X) = F(\textbf{Z}) = \frac{e^{\textbf{Z}}}{1 + e^{\textbf{Z}}}, \hspace{1cm} -\infty &lt; z &lt;\infty,\hspace{1cm} (2)
+\]</span></p>
+<p>con <span class="math inline">\(z = \textbf{X}^T\beta = \beta_0 + \beta_1x_1 + . . . + \beta_nx_n\)</span>.</p>
+<div class="quarto-figure quarto-figure-center">
+<figure class="figure">
+<p><img src="images/Figura_1.png" class="img-fluid figure-img"></p>
+<figcaption>Fuente: Flores y Rincón (2002, 128)</figcaption>
+</figure>
+</div>
+<p>donde:</p>
+<ul>
+<li><p>$ $ Es la variable dependiente, binaria, que no puede tomar dos posibles valores, que se etiquetarán con 0 (cliente malo) y 1 (cliente bueno).</p></li>
+<li><p><span class="math inline">\(\textbf{X:}\)</span> Es el conjunto de <span class="math inline">\(n\)</span> variables independientes <span class="math inline">\((x_1, x_2, . . . , x_n)\)</span> relacionadas con la información propia del solicitante, tomadas con el fin de explicar y/o predecir el valor de <span class="math inline">\(\textbf{Y}\)</span>.</p></li>
+<li><p><span class="math inline">\(F(\textbf{Z}):\)</span> Es la función de probabilidad, que depende de un vector de parámetros <span class="math inline">\(\beta = (\beta_0, \beta_1, . . . , \beta_n)\)</span>, que permitirán relacionar las variables independientes <span class="math inline">\(\textbf{X}\)</span>, con la dependiente <span class="math inline">\(\textbf{Y}\)</span>. Esta función tiene un rango entre <span class="math inline">\([0,1]\)</span> y se conoce como función de distribución logística.</p></li>
+<li><p>El objetivo del modelo es encontrar los coeficientes <span class="math inline">\(\beta\)</span> que mejor se ajustan a la expresión <span class="math inline">\(P(Y = 1|X)\)</span>.</p></li>
+</ul>
+<section id="estimación-de-los-parámetros-del-modelo-logit" class="level3" data-number="1.1.1">
+<h3 data-number="1.1.1" class="anchored" data-anchor-id="estimación-de-los-parámetros-del-modelo-logit"><span class="header-section-number">1.1.1</span> Estimación de los parámetros del modelo logit</h3>
+<p>La estimación de los coeficientes <span class="math inline">\(\beta\)</span> puede realizarse a partir del método de máxima verosimilitud <span class="citation" data-cites="Guajarati">(<a href="references.html#ref-Guajarati" role="doc-biblioref">Gujarati 2005</a>)</span>.</p>
+<p>Supóngase que se cuenta con un conjunto de <span class="math inline">\(k\)</span> individuos; de tal forma que, catalogarles como buenos o malos clientes será definido por la variable <span class="math inline">\(Y_i\)</span>, considerando <span class="math inline">\(i = 1, . . . , k\)</span>.</p>
+<p>En vista que cada <span class="math inline">\(Y_i\)</span> es una variable aleatoria de Bernoulli, por tomar dos valores, 0 o 1, podemos expresar la probabilidad que suceda uno u otro evento, como sigue:</p>
+<p><span class="math display">\[
+\begin{eqnarray}
+P(Y_i = 1) &amp;=&amp; P_i\\[0.2cm]
+P(Y_i = 0) &amp;=&amp; 1 - P_i
+\end{eqnarray}
+\]</span></p>
+<p>su función de probabilidad será:</p>
+<p><span class="math display">\[
+f_i(Y_i) = P_i^{Y_i}\times (1 - P_i)^{1-Y_i}, \hspace{1cm} i = 1, . . . , k\hspace{1cm} (3)
+\]</span></p>
+<p>Es decir, la función <span class="math inline">\(f_i(Y_i)\)</span> denota la probabilidad de <span class="math inline">\(Y_i = 0~ o~ 1\)</span>.</p>
+<p>Como cada observación es independiente, la probabilidad conjunta de observar los <span class="math inline">\(k\)</span> valores de la variable <span class="math inline">\(Y\)</span>, se expresa como:</p>
+<p><span class="math display">\[
+f(Y_1, Y_2, . . . , Y_k) = \prod_{i=1}^{k} f_i(Y_i) = \prod_{i=1}^{k} P_i^{Y_i}
+\times (1- P_i)^{1-Y_i}\hspace{1cm}(4)\]</span></p>
+<p>A está probabilidad conjunta se le conoce como <strong><em>función de verosimilitud</em></strong>. Al tomar el logaritmo de está función se tiene:</p>
+<p><span class="math display">\[
+\begin{eqnarray}
+\ln(f(Y_1, Y_2, . . . , Y_k)) &amp;=&amp; \left[Y_i\ln P_i + (1 - P_i)\ln(1 - P_i)\right]\\[0.2cm]
+&amp;=&amp; \sum_{i=1}^{k} \left[Y_i\ln P_i - Y_i\ln(1-P_i) + \ln(1 - P_i)\right]\\[0.2cm]
+&amp;=&amp; \sum_{i=1}^{k} \left[Y_i\ln\left(\frac{P_i}{1 - P_i}\right)\right] + \sum_{i=1}^{k}\ln(1 - P_i)\hspace{1.5cm} (5)
+\end{eqnarray}
+\]</span></p>
+<p>Tal como se expuso en ecuación <span class="math inline">\((2)\)</span>, la probabilidad de que un individuo sea un buen o mal cliente es representado por:</p>
+<p><span class="math display">\[
+P_i = \frac{e^{X_i^T\beta}}{1 + e^{X_i^T\beta}} \hspace{1cm} (6)
+\]</span></p>
+<p>De aquí se puede, facilmente, demostrar que:</p>
+<p><span class="math display">\[
+1 - P_i = \frac{1}{1 + e^{X_i^T\beta}}\hspace{1cm}(7)
+\]</span></p>
+<p>De igual forma,</p>
+<p><span class="math display">\[
+\ln\left(\frac{P_i}{1-P_i}\right) = X_i^T\beta\hspace{1cm} (8)
+\]</span></p>
+<p>Considerando <span class="math inline">\((7)\)</span> y <span class="math inline">\((8)\)</span> en <span class="math inline">\((5)\)</span> , se puede expresar el logaritmo de la función de verosimilitud, como sigue</p>
+<p><span class="math display">\[
+\ln\left(f(Y_1, . . . , Y_k)\right) = \sum_{i=1}^{k}Y_i(X_i^T\beta) - \sum_{i=1}^{k}\ln\left(1 + e^{X_i^T\beta}\right)\hspace{1cm} (9)
+\]</span></p>
+<p>Podemos observar que <span class="math inline">\((9)\)</span> es una función que depende de los coeficientes <span class="math inline">\(\beta\)</span>, pues <span class="math inline">\(Y_i\)</span> y <span class="math inline">\(X_i\)</span> se conocen.</p>
+<p>El método de máxima verosimilitud consiste en maximizar la expresión <span class="math inline">\((9)\)</span>, para buscar la máxima capacidad predictiva. Para esto se deriva parcialmente, respecto a cada una de las incógnitas; es decir, respecto a cada <span class="math inline">\(\beta_j\)</span>, con <span class="math inline">\(j = 1, . . . , n\)</span>. Obteniendo un sistema de <span class="math inline">\(n\)</span> ecuaciones no lineales, que deberán resolverse por procedimientos numéricos.</p>
+<p>Una vez obtenidos los <span class="math inline">\(\beta\)</span> se verifica que en verdad maximicen la función de verosimilitud a partir de la condición de maximización de segundo orden. Luego de este proceso, se obtiene los coeficientes, necesarios para estimar la probabilidad de incumplimiento de un individuo, a partir de la ecuación <span class="math inline">\((2)\)</span>.</p>
+</section>
+<section id="interpretación-coeficientes-de-una-regresión-logística" class="level3" data-number="1.1.2">
+<h3 data-number="1.1.2" class="anchored" data-anchor-id="interpretación-coeficientes-de-una-regresión-logística"><span class="header-section-number">1.1.2</span> Interpretación coeficientes de una regresión logística</h3>
+<p>Una de las razones, por las cuales se utiliza con mayor frecuencia un modelo de regresión logística es que su interpretación es relativamente sencilla. Para apreciar este beneficio, es de ayuda entender el significado de <strong><em>odds</em></strong>. Tal como lo expresa <span class="citation" data-cites="Allison">(<a href="references.html#ref-Allison" role="doc-biblioref">Allison 2012</a>)</span> muchas personas consideran a una probabilidad como la forma <em>natural</em> de cuantificar que un evento ocurra, considerando valores que se mueven entre 0 y 1. Sin embargo, existen otras formas de representar un cambio natural en algún evento, esto son los <strong><em>odds ratios</em></strong>.</p>
+<p>El mismo autor, define los <strong><em>odds</em></strong>, como la relación entre el número esperado de veces que un evento ocurra y el número esperado de veces que este no ocurra. De esta forma, la relación entre el <strong><em>odds</em></strong> y la probabilidad es:</p>
+<p><span class="math display">\[
+Odds = \frac{probabilidad~que~un~evento~ocurra}{1 - Probabilidad~que~un~evento~ocurra}
+\]</span></p>
+<p>Esta expresión tiene relevancia en un modelo de regresión logística, pues si se considera <span class="math inline">\((6)\)</span> y <span class="math inline">\((7)\)</span> se tienen,</p>
+<p><span class="math display">\[
+\frac{P_i}{1- P_i} = \frac{\frac{e^{X_i^T\beta}}{1 + e^{X_i^T\beta}}}{\frac{1}{1 + e^{X_i^T\beta}}} = e^{X_i^T\beta}\hspace{1cm} (10)
+\]</span></p>
+<p>A esta expresión se la considera como <strong><em>transformación logit de la probabilidad</em></strong> <span class="math inline">\(P_i\)</span>, cuya parte izquierda es una razón de probabilidades u <em>odds</em> <span class="citation" data-cites="Flórez">(<a href="references.html#ref-Flórez" role="doc-biblioref">Flórez 2002</a>)</span>. Al considerar el logaritmo natural en <span class="math inline">\((10)\)</span> se obtiene el logaritmo de la razón de proabilidades conocido como logit y es por este término que al modelo de regresión logística se lo conoce, también, como modelo logit. Así, se llega a la ecuación <span class="math inline">\((8)\)</span>.</p>
+<p><span class="math display">\[
+L = \ln\left(\frac{P_i}{1 - P_i}\right) = X_i^T\beta = \beta_0 + \beta_1x_1 + . . . + \beta_nx_n\hspace{1cm}(11)
+\]</span></p>
+<p>De esta forma, la interpretación del modelo está dada por la expresión <strong><em>logit (L)</em></strong>; por ejemplo, <span class="math inline">\(\beta_2\)</span> mide el cambio en <span class="math inline">\(L\)</span> ocasionado por un cambio unitario en <span class="math inline">\(x_2\)</span>, suponiendo constante el resto de variables explicativas <span class="citation" data-cites="Guajarati">(<a href="references.html#ref-Guajarati" role="doc-biblioref">Gujarati 2005</a>)</span>.</p>
+<p>La interpretación del modelo también puede darse a partir del <strong><em>odds ratio,</em></strong> la cual es una medida de la magnitud de asociación entre dos variables; en este caso, cada una de las independientes con la dependiente. Un <strong><em>odds ratio</em></strong> mayor a 1, muestra que existe una relación positiva o directa entre las dos variables, mientras que un odds ratio menor a 1, establece una relación negativa o inversa. Cuando el odds ratio es igual a 1, significa que no existe una relación entre las mismas <span class="citation" data-cites="Salas">(<a href="references.html#ref-Salas" role="doc-biblioref">Velasco 1996</a>)</span>.</p>
+<p>El <strong><em>odds ratio</em></strong> puede calcularse a partir de la estimación de los parámetros del modelo</p>
+<p><span class="math display">\[
+odds~ratio = e^\beta\hspace{6cm}(12)
+\]</span></p>
+</section>
+</section>
+<section id="modelo-de-redes-neuronales" class="level2" data-number="1.2">
+<h2 data-number="1.2" class="anchored" data-anchor-id="modelo-de-redes-neuronales"><span class="header-section-number">1.2</span> Modelo de Redes Neuronales</h2>
+<p>Las redes neuronales artificiales (RNA) son modelos matemáticos computacionales que intentan imitar el funcionamiento del cerebro de la forma como este procesa la información. Se cataloga dentro de las técnicas no paramétricas de <em>credit scoring</em>, como sistemas con la capacidad de aprender a través de entrenamiento, también conocido como la interpretación que ellas hacen de la información que reciben <span class="citation" data-cites="bahamon">(<a href="references.html#ref-bahamon" role="doc-biblioref">BAHAMÓN 2013</a>)</span>.</p>
+<section id="modelo-biológico" class="level3" data-number="1.2.1">
+<h3 data-number="1.2.1" class="anchored" data-anchor-id="modelo-biológico"><span class="header-section-number">1.2.1</span> Modelo Biológico</h3>
+<p><img src="images/figura2.png" class="img-fluid"></p>
+<p>La figura muestra un tipo común de neurona biológica, que está compuesta principalmente por:</p>
+<ul>
+<li><p>Un cuerpo central, que contiene el núcleo celular, denominado Soma.</p></li>
+<li><p>La conexión entre neuoronas se establece a partir de una prolongación del Soma, llamada Axón, que también se ramifica en su extremo final para establecer conexión con ontras neuronas, estas ramificaciones son conocidas como terminales axónicos.</p></li>
+<li><p>Las dendritas que son ramificaciones del cuerpo central, con las cuales se logra la conexión sináptica.</p></li>
+</ul>
+<p>Se estima que alrededor de cien mil millones de neuronas son las que conforman el sistema nervioso; estas se diferencian del resto de células vivas en el hecho que poseen capacidad de comunicarse.</p>
+<p>En general, las dendritas y el Soma reciben las señales de entrada, el cuerpo celular las combina y emite señales de salida; a continuación, el Axón transmite esta señal a sus terminales, que se encargan de distribuir la información a otro conjunto de neuronas <span class="citation" data-cites="Brio">(<a href="references.html#ref-Brio" role="doc-biblioref">Brío 2002</a>)</span>.</p>
+<p>Un aspecto muy importante en el proceso e comunicación entre neuronas es el término conocido como sinapsis. Brio y Molina (2002) lo definen como la unión entre dos neuronas, en el proceso de generación y transmisión de la señal nerviosa.</p>
+</section>
+<section id="elementos-de-una-red-neuronal-artificial" class="level3" data-number="1.2.2">
+<h3 data-number="1.2.2" class="anchored" data-anchor-id="elementos-de-una-red-neuronal-artificial"><span class="header-section-number">1.2.2</span> Elementos de una red neuronal artificial</h3>
+<p>Para introducir los elementos de una red neuronal artificial, se hará uso de la siguiente figura, que cuenta con una sola neurona; es decir, una pequeña parte de un sistema de red neuronal artificial. Además, se puede evidenciar que esta tiene una forma similar a la neurona biológica de la figura anterior.</p>
+<p><img src="images/figura_3.png" class="img-fluid"></p>
+<p>Se puede observar en esta figura que se tiene un elemento central, llamado <strong><em>neurona artificial</em></strong> la cual recibe información del exterior o de otras neuronas. Las <em>dendritas</em> son la estructura a través de la cual la neurona artificial recibe información, que luego es procesada de acuerdo con la intensidad asignada al nexo entre la unión de las entradas y las neuronas; este nexo se denomina <em>sinapsis</em> y a la intensidad descrita se le conoce como <em>peso sináptico</em> <span class="math inline">\((\textbf{W})\)</span>.</p>
+<p>Las redes neuronales intentan reproducir el comportamiento del cerebro, por lo cual, cualquier modelo de red neuronal consta de dispositivos elementales de proceso, denominados neuronas.</p>
+<p>Los elementos que constituyen a una neurona <span class="math inline">\(z\)</span> son los siguientes:</p>
+<ul>
+<li><p>Conjunto de entradas <span class="math inline">\(x_i(t)\)</span>, <span class="math inline">\(i = 1, . . . , n\)</span>: las cuales pueden ser binarias o continuas, dependiendo del tipo de modelo y aplicación.</p></li>
+<li><p>Pesos sinápticos de la nuerona <span class="math inline">\(z\)</span>: catalogados como <span class="math inline">\(w_{zi}\)</span>, que representa la intensidad de interacción entre la entrada <span class="math inline">\(i\)</span> y la neurona <span class="math inline">\(z\)</span>. Dependiendo de los pesos, se puede obtener la salida necesaria, considerando entradas específicas. Cuanto más grande sea el peso, más fuerte y relevante será el nodo de entrada.</p></li>
+<li><p>Función de agregación también llamada regla de propagación: Se denomina función de agregación a aquella regla que relaciona las entradas y los pesos para obtener el valor de la señal postsináptica <span class="math inline">\(h_z\)</span>, conocido como potencial postsináptico: <span class="math display">\[h_z(t) = \sigma_z(w_{zi},x_i(t))\]</span><br>
+La función más habitual es lineal y consiste en la suma ponderada de las entradas con los pesos signápticos, <span class="math display">\[h_z(t) = \sum_{i=1}^n w_{zi}x_i \]</span><br>
+Dada una entrada positiva, si el peso también es positivo, entonces este tenderá a excitar a la neurona, si el peso es negativo, tenderá a inhibirla <span class="citation" data-cites="Brio">(<a href="references.html#ref-Brio" role="doc-biblioref">Brío 2002</a>)</span>.</p></li>
+<li><p>Función de activación: La misma proporciona el estado de activación, en el tiempo <span class="math inline">\(t\)</span>, <span class="math inline">\(a_z(t)\)</span>, a partir del potencial postsináptico <span class="math inline">\(h_z(t)\)</span> y del estado de activación anterior <span class="math inline">\(a_z(t-1)\)</span>. <span class="math display">\[a_z(t) = f_z(a_z(t-1), h_z(t))\]</span><br>
+Sin embargo muchos modelos de redes neuronales consideran que el estado actual de la neurona (tiempo <span class="math inline">\(t\)</span>) no depende de su estado anterior <span class="citation" data-cites="Brio">(<a href="references.html#ref-Brio" role="doc-biblioref">Brío 2002</a>)</span>, por lo cual <span class="math display">\[a_z(t) = f_z(h_z(t))\]</span><br>
+En general se puede establecer dos estados posibles, reposo y excitado, a los cuales se les asigna un valor que puede ser continuo o discreto <span class="citation" data-cites="González">(<a href="references.html#ref-González" role="doc-biblioref">González 2000</a>)</span>.</p></li>
+</ul>
+<p>En la mayor parte de modelos la función de activación <span class="math inline">\(f(\cdot)\)</span> es monótona creciente y continua. En el siguiente cuadro, se exponen las funciones de activación más usuales, en donde: <span class="math inline">\(\textbf{x}\)</span> representa el potencial postsináptico y el estado de activación.</p>
+<table class="caption-top table">
+<caption>Funciones de activación usuales.</caption>
+<colgroup>
+<col style="width: 18%">
+<col style="width: 38%">
+<col style="width: 29%">
+</colgroup>
+<thead>
+<tr class="header">
+<th></th>
+<th>Función</th>
+<th>Rango</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>Identidad</td>
+<td><span class="math display">\[
+y = x
+\]</span></td>
+<td><span class="math display">\[
+[-\infty, +\infty]
+\]</span></td>
+</tr>
+<tr class="even">
+<td>Escalón</td>
+<td><p><span class="math display">\[
+y = sign(x)
+\]</span></p>
+<p><span class="math display">\[
+y = H(x)
+\]</span></p></td>
+<td><p><span class="math display">\[
+{-1, +1}
+\]</span></p>
+<p><span class="math display">\[
+{0, +1}
+\]</span><br>
+</p></td>
+</tr>
+<tr class="odd">
+<td>Sigmoidea</td>
+<td><p><span class="math display">\[
+y = \frac{1}{1 + e^-x}
+\]</span></p>
+<p><span class="math display">\[
+y = tgh(x)
+\]</span></p></td>
+<td><p><span class="math display">\[
+[0, +1]
+\]</span></p>
+<p><span class="math display">\[
+[-1, +1]
+\]</span></p></td>
+</tr>
+<tr class="even">
+<td>Gaussiana</td>
+<td><span class="math display">\[
+y = Ae^{-Bx^2}
+\]</span></td>
+<td><span class="math display">\[
+[0, +1]
+\]</span></td>
+</tr>
+<tr class="odd">
+<td>Sinusoidal</td>
+<td><span class="math display">\[
+y = Asin(\omega x + \phi)
+\]</span></td>
+<td><span class="math display">\[
+[-1, +1]
+\]</span></td>
+</tr>
+</tbody>
+</table>
+<p>Muchas veces se adiciona al grupo de pesos, un parámetro adicional <span class="math inline">\(\theta_z\)</span>, el cual se resta del potencial postsináptico, y representa características propias de la neurona, de tal forma que no es igual en todas ellas.<br>
+<br>
+Por ejemplo, en el caso de neuronas todo-nada, el parámetro representa el nivel mínimo que debe lograr el potencial postsináptico para que la neurona se active. De tal forma, el argumento de la función de activación se expresa de la siguiente forma <span class="math display">\[\sum_{i=1}^n w_{zi}x_i - \theta_z\]</span></p>
+<ul>
+<li>Función de salida: Es la función que proporciona la salida de la neurona <span class="math inline">\(y_z(t)\)</span>, que depende del estado de activación <span class="math inline">\(a_z(t)\)</span>. Por lo general la función de salida es la identidad <span class="math inline">\((F(x) = x)\)</span> por lo cual la salida es considerada con el estado de activación de la neurona <span class="math display">\[y_z(t) = F_z(a_z(t)) = a_z(t)\]</span> Finalmente, el modelo neuronal que <span class="citation" data-cites="Brio">(<a href="references.html#ref-Brio" role="doc-biblioref">Brío 2002</a>)</span> denomina como estándar queda como se muestra a continuación <span class="math display">\[y_z(t) = f_z(\sum_{i=1}^n w_{zi}x_i - \theta_z) = f_z(\sum_{i=0}^n w_{zi}x_i)\]</span> con <span class="math inline">\(w_{z0} = \theta_z\)</span> y <span class="math inline">\(x_0 = -1\)</span>.</li>
+</ul>
+</section>
+<section id="arquitectura-de-las-redes-neuronales" class="level3" data-number="1.2.3">
+<h3 data-number="1.2.3" class="anchored" data-anchor-id="arquitectura-de-las-redes-neuronales"><span class="header-section-number">1.2.3</span> Arquitectura de las redes neuronales</h3>
+<p>En la sección previa se mostroó los principales componentes de una red neuronal. A continuación, se expone las características de cada nodo de la red, así como la organización de esta.</p>
+<p>Generalmente, se puede encontrar tres tipos de neuronas:</p>
+<ul>
+<li><p>Las que toman la información de entrada, de las fuentes externas de la red.</p></li>
+<li><p>Las que procesan la información y generan cualquier tipo de representación interna de la misma. A estos se los denomina unidades ocultas pues no tienen relación directa con la información de entrada o de salida.</p></li>
+<li><p>Cuando ya se tiene procesada la información, esta pasa a los nodos de salida, los cuales dan una respuesta al sistema.</p></li>
+</ul>
+<p>La distribución de estas neuronas está dada formando niveles o capas de un número determinado de neuronas cada una. Así, se puede determinar tres tipos de capas: de entrada, ocultas y de salida, conformadas por los tipos de neuronas ya descritas.</p>
+<p>El número de capas ocultas puede estar entre cero 1 un número elevado y pueden estar interconectadas de diversas formas, estos dos aspectos determinan las distintas tipologías de redes neuronales.</p>
+<p>Otro aspecto importante en la arquitectura de una red neuronal es la forma en la que se realizan las conexiones entre las neuronas, es decir, la forma en la que las salidas de las nueronas están encaminadas para convertirse en las entradas de otras neuronas. Incluso se puede dar que la salida de un nodo sea la entrada de sí misma, llamandose a este tipo de conexión como auto recurrente.</p>
+<p><span class="citation" data-cites="González">(<a href="references.html#ref-González" role="doc-biblioref">González 2000</a>)</span> mencionan dos tipos de conexiones, <em><code>propagación hacia atrás</code></em> que es cuando las salidas de los nodos pueden conectarse con capas previas o del mismo nivel, incluso con si mismos. Y <em><code>propagación hacia adelante</code></em>, cuando la salida de los nodos se conecta únicamente con nodos de capas posteriores.</p>
+<div class="quarto-figure quarto-figure-center">
+<figure class="figure">
+<p><img src="images/figura_4.png" class="img-fluid figure-img"></p>
+<figcaption>Estructura de una red neuronal artificial multicapa.</figcaption>
+</figure>
+</div>
+<p>Es así, que la arquitectura de las redes neuronales se basa en la forma en que se organizan y disponen las neuronas formando capas más o menos alejadas de la entrada y salida de la red, tal como se muestra en la figura.</p>
+<p>En general, no se cuenta con una regla que determine el número óptimo de neuronas ocultas que ayudan a resolver un problema; sino más bien, es a base de prueba y error, realizando cambios en el que se asume o reste el número de neuronas ocultas hasta alcanzar la estructura que mejor se ajuste a la solución de un problema dado <span class="citation" data-cites="Tudela">(<a href="references.html#ref-Tudela" role="doc-biblioref">Tudela 2011</a>)</span>.</p>
+<p>Se suele distinguir entre redes con una sola capa o un solo nivel de neuronas denominadas como <em>redes monocapa</em> y, con múltiples capas. Es así que, los principales parámetros de una red neuronal serían el número de capas, el número de neuronas en cada capa, el grado de conectividad y el tipo de conexión entre cada neurona <span class="citation" data-cites="Carranza">(<a href="references.html#ref-Carranza" role="doc-biblioref">Carranza Bravo 2010</a>)</span>.</p>
+</section>
+<section id="modos-de-operación-de-una-red-neuronal" class="level3" data-number="1.2.4">
+<h3 data-number="1.2.4" class="anchored" data-anchor-id="modos-de-operación-de-una-red-neuronal"><span class="header-section-number">1.2.4</span> Modos de operación de una red neuronal</h3>
+<p>Se considera dos tipos de operación en un sistema neuronal: el modo recuerdo o ejecución y el modo aprendizaje.</p>
+<section id="fase-de-aprendizaje" class="level4" data-number="1.2.4.1">
+<h4 data-number="1.2.4.1" class="anchored" data-anchor-id="fase-de-aprendizaje"><span class="header-section-number">1.2.4.1</span> Fase de aprendizaje</h4>
+<p>Se tiene un especial interés en esta fase pues una de las principales características de una red neuronal es que son sistemas entrenables, es decir, son capaces de llevar a cabo un específico procesamiento aprendiendo de un grupo de patrones de aprendizaje o ejemplos.</p>
+<p>Puede definirse al aprendizaje como el proceso en el cual se modifica los pesos de la neurona en respuesta a la información de entrada. Tal como expresa <span class="citation" data-cites="González">(<a href="references.html#ref-González" role="doc-biblioref">González 2000</a>)</span> en el proceso de aprendizaje se destruye, modifica y crea conexiones entre las neuronas; que una conexión se destruya signifca que su peso pasa a tener el valor de cero y que se cree significa que toma un valor diferente de cero.</p>
+<p>Como ya se mencionó, en el proceso de aprendizaje se modifican los pesos de las conexiones. Por lo cual, se puede establecer que la red neuronal ha terminado su fase de aprendizaje una vez que los pesos logren estabilidad en el tiempo. Generalmente, su modifica los pesos sinápticos siguiendo cierta regla de aprendizaje, que es construida a partir de una función de error. Este proceso es iterativo, es decir, los pesos van actualizándose una y otra vez hasta que la red neuronal logra un rendimiento deseado <span class="citation" data-cites="Brio">(<a href="references.html#ref-Brio" role="doc-biblioref">Brío 2002</a>)</span>.</p>
+<p>Es importante conocer las reglas de aprendizaje de la red; que son los criterios para cambiar los pesos de las conexiones, con el objetivo que esta aprenda. Se considera dos tipos de reglas, aprendizaje supervizado y no supervizado, cuya diferencia principal radica en la existencia o no de un agente externo que controle el proceso.</p>
+<p><em><code>Redes neuronales con aprendizajes supervisado:</code></em> En este tipo de aprendizaje se tiene la participación de un agente externo o supervisor que establece la respuesta que debería tener la red a partir de una entrada específica. Este supervisor comprueba la salida de la red y si no se da la coincidencia con la deseada, se modifica los pesos de las conexiones, hasta que la salida se aproxime al valor requerido <span class="citation" data-cites="González">(<a href="references.html#ref-González" role="doc-biblioref">González 2000</a>)</span>.</p>
+<p><em><code>Redes neuronales con aprendizaje no supervizado:</code></em> Este tipo de aprendizaje no requiere de un agente externo para ajustar los pesos de las conexiones, la red no recibe informacipon que le indique la salida deseada en función de una determinada entrada. Esto significa que no conoce si la salidad de la neurona es correcta o no, se dice que estas redes son capaces de autoorganizarse <span class="citation" data-cites="González">(<a href="references.html#ref-González" role="doc-biblioref">González 2000</a>)</span>.</p>
+<p>Un criterio a tener en cuenta en las reglas de aprendizaje es lo que se conoce como aprendizaje <em>on line</em> y <em>off line</em>. <span class="citation" data-cites="González">(<a href="references.html#ref-González" role="doc-biblioref">González 2000</a>)</span> establecen que en el aprendizaje <em>on line</em> los pesos varían dinámicamente siempre que se ingrese nueva información al sistema; mientras que, en el aprendizaje <em>off line</em>, una vez que la red a aprendido, los pesos se mantienen fijos.</p>
+</section>
+<section id="fase-de-recuerdo" class="level4" data-number="1.2.4.2">
+<h4 data-number="1.2.4.2" class="anchored" data-anchor-id="fase-de-recuerdo"><span class="header-section-number">1.2.4.2</span> Fase de Recuerdo</h4>
+<p><br>
+<br>
+Por lo general, una vez que la red a concluido su fase de aprendizaje esta se <em>“apaga o desconecta”; es decir, pasa a un estado off line,</em> por lo cual, los pesos, conexiones y estructura de la red se mantiene fijos y esta puede procesar nueva información.</p>
+</section>
+</section>
+<section id="clasificación-de-los-modelos-neuronales" class="level3" data-number="1.2.5">
+<h3 data-number="1.2.5" class="anchored" data-anchor-id="clasificación-de-los-modelos-neuronales"><span class="header-section-number">1.2.5</span> Clasificación de los modelos neuronales</h3>
+<p>Por lo expresado hasta el momento se puede deducir que dependiendo del modelo de neurona que se utilice, su arquitectura, tipo de conexión, y algoritmo de aprendizaje se obtendrá distintos modelos de redes neuronales.</p>
+<p>En la figura 6 se expone, a modo de resumen, la clasificación de las redes neuronales por tipo de aprendizaje y arquitectura ya expuestas anteriormente.</p>
+<div class="quarto-figure quarto-figure-center">
+<figure class="figure">
+<p><img src="images/Figura_5.png" class="img-fluid figure-img"></p>
+<figcaption>Clasificación de las redes neuronales.</figcaption>
+</figure>
+</div>
+<p>En el caso de un <em><code>Credit Scoring</code></em>, los nodos de entrada representan las variables independientes <span class="math inline">\(X\)</span>, que son las características propias del solicitante de crédito. La respuesta de la neurona producirá una salida que representa la variable dependiente <span class="math inline">\(Y\)</span>, descrita anteriormente <span class="citation" data-cites="Jiménez">(<a href="references.html#ref-Jiménez" role="doc-biblioref">Jiménez-Caballero 2000</a>)</span>.</p>
+<p>El método que se utilizará para encontrar los pesos de la red neuronal, del presente proyecto, es el algoritmo RPROP+ <em>(resilient backpropagation with weight backtracking).</em></p>
+<p>Tal como lo expresa <span class="citation" data-cites="Riedmiller">(<a href="references.html#ref-Riedmiller" role="doc-biblioref">Riedmiller 1993</a>)</span> el algoritmo Backpropagation es el más extensamente usado para aprendizaje supervisado y redes neuronales multicapa. Desafortunadamente este puede ser muy lento para aplicaciones prácticas <span class="citation" data-cites="Shiffmann">(<a href="references.html#ref-Shiffmann" role="doc-biblioref">Schiffmann 1994</a>)</span>. Para superar esta dificultad se propone diversas variantes a este método como el método <em>RPROP+,</em> el cual es usado en este trabajo. Tanto el algoritmo Backpropagation como su variante <em>RPROP+,</em> son descritos a continuación.</p>
+</section>
+<section id="algoritmo-backpropagation" class="level3" data-number="1.2.6">
+<h3 data-number="1.2.6" class="anchored" data-anchor-id="algoritmo-backpropagation"><span class="header-section-number">1.2.6</span> Algoritmo Backpropagation</h3>
+<p>El algoritmo de backpropagation es el más ampliamente usado para modelos con aprendizaje supervizado multicapa. La idea básica de este algoritmo es la siguiente:</p>
+<p>En un espacio de <span class="math inline">\(N+1\)</span> dimensiones, donde <span class="math inline">\(N\)</span> es el número de pesos de la red, se representa una superficie que muestre el error que se genera en la red neuronal, para un determinado valor en los pesos de esta.</p>
+<p>El algoritmo backpropagation hace que se vaya bajando por la superficie del error hasta lograr un mínimo, es por esta razón que la variación de un peso <span class="math inline">\(w_{ij}\)</span> de la red, en una iteración, al procesar un conjunto de patrones <span class="math inline">\(p_i\)</span>, es proporcional al gradiente descendente <span class="citation" data-cites="González">(<a href="references.html#ref-González" role="doc-biblioref">González 2000</a>)</span>.</p>
+<p><span class="math display">\[
+\triangle w_{ji} = -\alpha \frac{\partial E_{p}}{\partial w_{ji}}
+\]</span></p>
+<p>Considerando a E la función de error, se tiene que:</p>
+<p><span class="math display">\[
+\frac{\partial E_p}{\partial w_{ji}} = \frac{\partial E_p}{\partial y_{pj}}\times \frac{\partial y_{pj}}{\partial Net_{j}}\times \frac{\partial Net_{j}}{\partial w_{ji}}
+\]</span></p>
+<p>Donde <span class="math inline">\(w_{ji}\)</span> representa el peso de la neurona <span class="math inline">\(j\)</span> a la reunión <span class="math inline">\(i\)</span>, <span class="math inline">\(y_{pj}\)</span> es la salida de la neurona <span class="math inline">\(j\)</span> en el patrón <span class="math inline">\(p\)</span>, y <span class="math inline">\(Net_j\)</span> es la suma ponderada de las entradas a la neurona <span class="math inline">\(j\)</span>, es decir:</p>
+<p><span class="math display">\[
+Net_j = \sum_{i=1}^k w_{ji}\times y_i
+\]</span></p>
+<p><span class="math display">\[
+y_{pj} = f(Net_j)
+\]</span></p>
+<p>Siendo <span class="math inline">\(k\)</span>, en número de entradas de la neurona <span class="math inline">\(j\)</span> y <span class="math inline">\(f\)</span> la función de activación, derivable.</p>
+<p>Es así, que la actualización de los pesos está dada por la siguiente ecuación:</p>
+<p><span class="math display">\[
+w_{ji}(t+1) = w_{ji}(t) - \alpha \frac{\partial E_p}{\partial w_{ji}}(t+1)
+\]</span></p>
+<p>Es evidente que la elección de <span class="math inline">\(\alpha\)</span> tiene un efecto importante en el tiempo de convergencia del algoritmo, el cual se detiene cuando el error resulte aceptablemente pequeño para cada uno de los patrones aprendido.</p>
+</section>
+<section id="algoritmo-rprop" class="level3" data-number="1.2.7">
+<h3 data-number="1.2.7" class="anchored" data-anchor-id="algoritmo-rprop"><span class="header-section-number">1.2.7</span> Algoritmo RPROP+</h3>
+<p>Una alternativa al algoritmo de backpropagation es el resiliente backpropagation (RPROP+) en el que, en lugar de usar la magnitud de la derivada <span class="math inline">\(\frac{\partial E_p}{\partial w_{ji}}\)</span>, presente en la ecuación <span class="math inline">\(\triangle w_{ji}\)</span>, se considera únicamente su signo multiplicado por una constante. Este algoritmo tiene la ventaja de ser uno de los algoritmos de aprendizaje más rápidos <span class="citation" data-cites="Almeida">(<a href="references.html#ref-Almeida" role="doc-biblioref">Almeida 2009</a>)</span>.</p>
+<p>El algoritmo RPROP+ consiste en los siguiente <span class="citation" data-cites="Igel">(<a href="references.html#ref-Igel" role="doc-biblioref">Igel 2000</a>)</span>: Para cada peso se introduce su valor de actualización <span class="math inline">\(\triangle_{ji}\)</span>, que determina el tamaño de la actualización del peso.</p>
+<p><span class="math display">\[
+\left\{\begin{array}{cc}\eta^+ \times \Delta_{ji}^{t-1}, &amp; si ~ \frac{\partial E_p^{(t-1)}}{\partial w_{ji}} \times \frac{\partial E_{p}^{(t)}}{\partial w_{ij}} &gt; 0\\\eta^- \times \Delta_{ij}^{t-1}, &amp; si~ \frac{\partial E_{p}^{(t-1)}}{\partial w_{ij}} \times \frac{\partial E_{p}^{(t)}}{\partial w_{ij}} &lt; 0  \\\Delta_{ji}^{t-1}, &amp; caso~contrario\end{array}\right.
+\]</span>Donde <span class="math inline">\(0 &lt; \eta^- &lt; 1&lt; \eta^+\)</span>. <span class="math inline">\(\Delta_{ji}\)</span> están acotados por dos parámetros <span class="math inline">\(\Delta_{\min}\)</span> y <span class="math inline">\(\Delta_{\max}\)</span>. Una vez obtenidos los tamaños de actualización es necesario el valor de variación de los pesos <span class="math inline">\(\Delta w_{ji}\)</span>, distinguiendo dos casos.</p>
+<p>Si el signo de la derivada parcial no ha cambiado se tiene:</p>
+<p><span class="math display">\[
+Si ~ \frac{\partial E_{p}^{(t-1)}}{\partial w_{ji}} \times \frac{\partial E_{p^{(t)}}}{\partial w_{ji}} ≥ 0 ~ entonces ~ \Delta w_{ji}^t = -sign\left(\begin{array}{c}\frac{\partial E_{p}^{(t)}}{\partial w_{ji}}\end{array}\right) \times \Delta_{ji}^t
+\]</span></p>
+<p>Donde el operador signo retorna +1 si el argumento es positivo, -1 si es negativo y 0 en otro caso. En caso de que el signo de la derivada parcial cambia, se tiene:</p>
+<p><span class="math display">\[
+Si ~ \frac{\partial E_{p}^{(t-1)}}{\partial w_{ji}} \times \frac{\partial E_{p}^{(t)}}{\partial w_{ji}} &lt; 0 ~ entonces ~ \Delta w_{ji}^t = - \Delta w_{ji}^{t-1} ~ y ~ \frac{\partial E_{p}^{(t)}}{\partial w_{ji}} = 0
+\]</span></p>
+<p>Finalmente se actualiza los nuevos pesos, los cuales están dados por,</p>
+<p><span class="math display">\[
+w_{ji}(t+1) ) w_{ji}(t) + \Delta w_{ji}(t)
+\]</span>La función de error que será usada para optimizar los pesos es la suma de los errores cuadráticos definida de la siguiente forma <span class="citation" data-cites="Ladino">Ladino (<a href="references.html#ref-Ladino" role="doc-biblioref">2014</a>)</span> :</p>
+<p><span class="math display">\[
+E = \frac{1}{2}\sum_{i=1}^n (y_i - \hat{y_i})^2
+\]</span></p>
+<p>Donde <span class="math inline">\(n\)</span> es el número de datos en entrenamiento, observaciones, <span class="math inline">\(y_i\)</span> es la salida deseada y <span class="math inline">\(\hat{y_i}\)</span> es la salida de la red.</p>
+
+
+<div id="refs" class="references csl-bib-body hanging-indent" data-entry-spacing="0" role="list" style="display: none">
+<div id="ref-Allison" class="csl-entry" role="listitem">
+Allison, Paul D. 2012. <em>Logistic Regression Using SAS: Theory and Application</em>. SAS Press.
+</div>
+<div id="ref-Almeida" class="csl-entry" role="listitem">
+Almeida, Carlton Baugh, C. 2009. <em><span>“Modelling the Dusty Universe i: Introducing the Artificial Neural Network and First Applications to Luminosity and Colour Distributions”</span></em>. Monthly Notices of the Royal Astronomical Society 402 (junio). https://doi.org/10.1111/j.1365-2966.2009.15920.x.
+</div>
+<div id="ref-bahamon" class="csl-entry" role="listitem">
+BAHAMÓN, RODRIGO VILLAMIL. 2013. <em>MODELO PREDICTIVO NEURONAL PARA LA EVALUACIÓN DEL RIESGO CREDITICIO</em>. Universidad Nacional de Colombia.
+</div>
+<div id="ref-Brio" class="csl-entry" role="listitem">
+Brío, y Alfredo Sanz Molina, Bonifacio Martín del. 2002. <em>Redes Neuronales y Sistemas Difusos</em>. Bogotá Colombia.
+</div>
+<div id="ref-Carranza" class="csl-entry" role="listitem">
+Carranza Bravo, Paola. 2010. <em>“INTRODUCCIÓN a LAS TÉCNICAS DE INTELIGENCIA ARTIFICIAL APLICADAS a LA GESTIÓN FINANCIERA EMPRESARIAL</em>. Fides et Ratio - Revista de Difusión cultural y científica de la Universidad La Salle en Bolivia 4 (4): 8–15.
+</div>
+<div id="ref-Flórez" class="csl-entry" role="listitem">
+Flórez, Orlando Moscote, y William Arley Rincón. 2002. <em>‘Modelo Logit y Probit: Un Caso de Aplicación</em>. Universidad Santo Tomas de Colombia.
+</div>
+<div id="ref-González" class="csl-entry" role="listitem">
+González, y Víctor José Martínez Hernando, José Ramón Hilera. 2000. <em>Redes Neuronales Artificiales: Fundamentos, Modelos y Aplicaciones.</em> México: Alfaomega: Ra-Ma.
+</div>
+<div id="ref-Guajarati" class="csl-entry" role="listitem">
+Gujarati, Damodar N, Demetrio Garmendia Guerrero. 2005. <em>Econometría</em>. McGraw-Hill.
+</div>
+<div id="ref-Gutierrez" class="csl-entry" role="listitem">
+Gutierrez Girault, Matias Alfredo. 2007. <em>Modelos de Credit Scoring: Qué, Cómo, Cuándo y Para Qué</em>. Munich Personal RePEc Archive.
+</div>
+<div id="ref-Igel" class="csl-entry" role="listitem">
+Igel, y Michael Hüsken, Christian. 2000. <em><span>“Improving the Rprop Learning Algorithm”</span></em>.
+</div>
+<div id="ref-Jiménez" class="csl-entry" role="listitem">
+Jiménez-Caballero, y Ramón Jesús Ruiz Martínez, José Luis. 2000. <em><span>“Las Redes Neuronales En Su Aplicación a Las Finanzas”</span></em>. Banca y finanzas: Revista profesional de gestión financiera, núm. 54: 19–27.
+</div>
+<div id="ref-Ladino" class="csl-entry" role="listitem">
+Ladino, Becerra Iván Camilo. 2014. <em><span>“Comparación de Modelos de Riesgo de Crédito: Modelos Logísticos y Redes Neuronales”</span></em>. Pontifica Universidad Javeriana Facultad de Ciencias Economicas y Administrativas maestria en economía.
+</div>
+<div id="ref-Riedmiller" class="csl-entry" role="listitem">
+Riedmiller, y Heinrich Braun, Martin. 1993. <em><span>“A Direct Adaptive Method for Faster Backpropagation Learning: The RPROP Algorithm”</span></em>. En, 1:586–91 vol.1. https://doi.org/10.1109/ICNN.1993.298623.
+</div>
+<div id="ref-Shiffmann" class="csl-entry" role="listitem">
+Schiffmann, M Joost, W. 1994. <em><span>“Optimization of the Backpropagation Algorithm for Training Multilayer Perceptrons”</span></em>. diciembre.
+</div>
+<div id="ref-Tudela" class="csl-entry" role="listitem">
+Tudela, y Gimmy Nardó., Sanjinés. 2011. <em>Análisis y Pronóstico de La Demanda de Potencia Eléctrica En Bolivia: Una Aplicación de Redes Neuronales</em>. Revista Latinoamericana de Desarrollo Económico.
+</div>
+<div id="ref-Salas" class="csl-entry" role="listitem">
+Velasco, Manuel Salas. 1996. <span>“La Regresión Logística . Una Aplicación a La Demanda de Estudios Universitarios.”</span> <em>ESTADÍSTICA ESPAÑOLA</em> 38 (141): 193–217.
+</div>
+</div>
+</section>
+</section>
+
+</main> <!-- /main -->
+<script id="quarto-html-after-body" type="application/javascript">
+window.document.addEventListener("DOMContentLoaded", function (event) {
+  const toggleBodyColorMode = (bsSheetEl) => {
+    const mode = bsSheetEl.getAttribute("data-mode");
+    const bodyEl = window.document.querySelector("body");
+    if (mode === "dark") {
+      bodyEl.classList.add("quarto-dark");
+      bodyEl.classList.remove("quarto-light");
+    } else {
+      bodyEl.classList.add("quarto-light");
+      bodyEl.classList.remove("quarto-dark");
+    }
+  }
+  const toggleBodyColorPrimary = () => {
+    const bsSheetEl = window.document.querySelector("link#quarto-bootstrap");
+    if (bsSheetEl) {
+      toggleBodyColorMode(bsSheetEl);
+    }
+  }
+  toggleBodyColorPrimary();  
+  const icon = "";
+  const anchorJS = new window.AnchorJS();
+  anchorJS.options = {
+    placement: 'right',
+    icon: icon
+  };
+  anchorJS.add('.anchored');
+  const isCodeAnnotation = (el) => {
+    for (const clz of el.classList) {
+      if (clz.startsWith('code-annotation-')) {                     
+        return true;
+      }
+    }
+    return false;
+  }
+  const clipboard = new window.ClipboardJS('.code-copy-button', {
+    text: function(trigger) {
+      const codeEl = trigger.previousElementSibling.cloneNode(true);
+      for (const childEl of codeEl.children) {
+        if (isCodeAnnotation(childEl)) {
+          childEl.remove();
+        }
+      }
+      return codeEl.innerText;
+    }
+  });
+  clipboard.on('success', function(e) {
+    // button target
+    const button = e.trigger;
+    // don't keep focus
+    button.blur();
+    // flash "checked"
+    button.classList.add('code-copy-button-checked');
+    var currentTitle = button.getAttribute("title");
+    button.setAttribute("title", "Copied!");
+    let tooltip;
+    if (window.bootstrap) {
+      button.setAttribute("data-bs-toggle", "tooltip");
+      button.setAttribute("data-bs-placement", "left");
+      button.setAttribute("data-bs-title", "Copied!");
+      tooltip = new bootstrap.Tooltip(button, 
+        { trigger: "manual", 
+          customClass: "code-copy-button-tooltip",
+          offset: [0, -8]});
+      tooltip.show();    
+    }
+    setTimeout(function() {
+      if (tooltip) {
+        tooltip.hide();
+        button.removeAttribute("data-bs-title");
+        button.removeAttribute("data-bs-toggle");
+        button.removeAttribute("data-bs-placement");
+      }
+      button.setAttribute("title", currentTitle);
+      button.classList.remove('code-copy-button-checked');
+    }, 1000);
+    // clear code selection
+    e.clearSelection();
+  });
+    var localhostRegex = new RegExp(/^(?:http|https):\/\/localhost\:?[0-9]*\//);
+    var mailtoRegex = new RegExp(/^mailto:/);
+      var filterRegex = new RegExp("https:\/\/j-isaula\.github\.io\/website_ji\/");
+    var isInternal = (href) => {
+        return filterRegex.test(href) || localhostRegex.test(href) || mailtoRegex.test(href);
+    }
+    // Inspect non-navigation links and adorn them if external
+ 	var links = window.document.querySelectorAll('a[href]:not(.nav-link):not(.navbar-brand):not(.toc-action):not(.sidebar-link):not(.sidebar-item-toggle):not(.pagination-link):not(.no-external):not([aria-hidden]):not(.dropdown-item):not(.quarto-navigation-tool)');
+    for (var i=0; i<links.length; i++) {
+      const link = links[i];
+      if (!isInternal(link.href)) {
+        // undo the damage that might have been done by quarto-nav.js in the case of
+        // links that we want to consider external
+        if (link.dataset.originalHref !== undefined) {
+          link.href = link.dataset.originalHref;
+        }
+      }
+    }
+  function tippyHover(el, contentFn, onTriggerFn, onUntriggerFn) {
+    const config = {
+      allowHTML: true,
+      maxWidth: 500,
+      delay: 100,
+      arrow: false,
+      appendTo: function(el) {
+          return el.parentElement;
+      },
+      interactive: true,
+      interactiveBorder: 10,
+      theme: 'quarto',
+      placement: 'bottom-start',
+    };
+    if (contentFn) {
+      config.content = contentFn;
+    }
+    if (onTriggerFn) {
+      config.onTrigger = onTriggerFn;
+    }
+    if (onUntriggerFn) {
+      config.onUntrigger = onUntriggerFn;
+    }
+    window.tippy(el, config); 
+  }
+  const noterefs = window.document.querySelectorAll('a[role="doc-noteref"]');
+  for (var i=0; i<noterefs.length; i++) {
+    const ref = noterefs[i];
+    tippyHover(ref, function() {
+      // use id or data attribute instead here
+      let href = ref.getAttribute('data-footnote-href') || ref.getAttribute('href');
+      try { href = new URL(href).hash; } catch {}
+      const id = href.replace(/^#\/?/, "");
+      const note = window.document.getElementById(id);
+      if (note) {
+        return note.innerHTML;
+      } else {
+        return "";
+      }
+    });
+  }
+  const xrefs = window.document.querySelectorAll('a.quarto-xref');
+  const processXRef = (id, note) => {
+    // Strip column container classes
+    const stripColumnClz = (el) => {
+      el.classList.remove("page-full", "page-columns");
+      if (el.children) {
+        for (const child of el.children) {
+          stripColumnClz(child);
+        }
+      }
+    }
+    stripColumnClz(note)
+    if (id === null || id.startsWith('sec-')) {
+      // Special case sections, only their first couple elements
+      const container = document.createElement("div");
+      if (note.children && note.children.length > 2) {
+        container.appendChild(note.children[0].cloneNode(true));
+        for (let i = 1; i < note.children.length; i++) {
+          const child = note.children[i];
+          if (child.tagName === "P" && child.innerText === "") {
+            continue;
+          } else {
+            container.appendChild(child.cloneNode(true));
+            break;
+          }
+        }
+        if (window.Quarto?.typesetMath) {
+          window.Quarto.typesetMath(container);
+        }
+        return container.innerHTML
+      } else {
+        if (window.Quarto?.typesetMath) {
+          window.Quarto.typesetMath(note);
+        }
+        return note.innerHTML;
+      }
+    } else {
+      // Remove any anchor links if they are present
+      const anchorLink = note.querySelector('a.anchorjs-link');
+      if (anchorLink) {
+        anchorLink.remove();
+      }
+      if (window.Quarto?.typesetMath) {
+        window.Quarto.typesetMath(note);
+      }
+      // TODO in 1.5, we should make sure this works without a callout special case
+      if (note.classList.contains("callout")) {
+        return note.outerHTML;
+      } else {
+        return note.innerHTML;
+      }
+    }
+  }
+  for (var i=0; i<xrefs.length; i++) {
+    const xref = xrefs[i];
+    tippyHover(xref, undefined, function(instance) {
+      instance.disable();
+      let url = xref.getAttribute('href');
+      let hash = undefined; 
+      if (url.startsWith('#')) {
+        hash = url;
+      } else {
+        try { hash = new URL(url).hash; } catch {}
+      }
+      if (hash) {
+        const id = hash.replace(/^#\/?/, "");
+        const note = window.document.getElementById(id);
+        if (note !== null) {
+          try {
+            const html = processXRef(id, note.cloneNode(true));
+            instance.setContent(html);
+          } finally {
+            instance.enable();
+            instance.show();
+          }
+        } else {
+          // See if we can fetch this
+          fetch(url.split('#')[0])
+          .then(res => res.text())
+          .then(html => {
+            const parser = new DOMParser();
+            const htmlDoc = parser.parseFromString(html, "text/html");
+            const note = htmlDoc.getElementById(id);
+            if (note !== null) {
+              const html = processXRef(id, note);
+              instance.setContent(html);
+            } 
+          }).finally(() => {
+            instance.enable();
+            instance.show();
+          });
+        }
+      } else {
+        // See if we can fetch a full url (with no hash to target)
+        // This is a special case and we should probably do some content thinning / targeting
+        fetch(url)
+        .then(res => res.text())
+        .then(html => {
+          const parser = new DOMParser();
+          const htmlDoc = parser.parseFromString(html, "text/html");
+          const note = htmlDoc.querySelector('main.content');
+          if (note !== null) {
+            // This should only happen for chapter cross references
+            // (since there is no id in the URL)
+            // remove the first header
+            if (note.children.length > 0 && note.children[0].tagName === "HEADER") {
+              note.children[0].remove();
+            }
+            const html = processXRef(null, note);
+            instance.setContent(html);
+          } 
+        }).finally(() => {
+          instance.enable();
+          instance.show();
+        });
+      }
+    }, function(instance) {
+    });
+  }
+      let selectedAnnoteEl;
+      const selectorForAnnotation = ( cell, annotation) => {
+        let cellAttr = 'data-code-cell="' + cell + '"';
+        let lineAttr = 'data-code-annotation="' +  annotation + '"';
+        const selector = 'span[' + cellAttr + '][' + lineAttr + ']';
+        return selector;
+      }
+      const selectCodeLines = (annoteEl) => {
+        const doc = window.document;
+        const targetCell = annoteEl.getAttribute("data-target-cell");
+        const targetAnnotation = annoteEl.getAttribute("data-target-annotation");
+        const annoteSpan = window.document.querySelector(selectorForAnnotation(targetCell, targetAnnotation));
+        const lines = annoteSpan.getAttribute("data-code-lines").split(",");
+        const lineIds = lines.map((line) => {
+          return targetCell + "-" + line;
+        })
+        let top = null;
+        let height = null;
+        let parent = null;
+        if (lineIds.length > 0) {
+            //compute the position of the single el (top and bottom and make a div)
+            const el = window.document.getElementById(lineIds[0]);
+            top = el.offsetTop;
+            height = el.offsetHeight;
+            parent = el.parentElement.parentElement;
+          if (lineIds.length > 1) {
+            const lastEl = window.document.getElementById(lineIds[lineIds.length - 1]);
+            const bottom = lastEl.offsetTop + lastEl.offsetHeight;
+            height = bottom - top;
+          }
+          if (top !== null && height !== null && parent !== null) {
+            // cook up a div (if necessary) and position it 
+            let div = window.document.getElementById("code-annotation-line-highlight");
+            if (div === null) {
+              div = window.document.createElement("div");
+              div.setAttribute("id", "code-annotation-line-highlight");
+              div.style.position = 'absolute';
+              parent.appendChild(div);
+            }
+            div.style.top = top - 2 + "px";
+            div.style.height = height + 4 + "px";
+            div.style.left = 0;
+            let gutterDiv = window.document.getElementById("code-annotation-line-highlight-gutter");
+            if (gutterDiv === null) {
+              gutterDiv = window.document.createElement("div");
+              gutterDiv.setAttribute("id", "code-annotation-line-highlight-gutter");
+              gutterDiv.style.position = 'absolute';
+              const codeCell = window.document.getElementById(targetCell);
+              const gutter = codeCell.querySelector('.code-annotation-gutter');
+              gutter.appendChild(gutterDiv);
+            }
+            gutterDiv.style.top = top - 2 + "px";
+            gutterDiv.style.height = height + 4 + "px";
+          }
+          selectedAnnoteEl = annoteEl;
+        }
+      };
+      const unselectCodeLines = () => {
+        const elementsIds = ["code-annotation-line-highlight", "code-annotation-line-highlight-gutter"];
+        elementsIds.forEach((elId) => {
+          const div = window.document.getElementById(elId);
+          if (div) {
+            div.remove();
+          }
+        });
+        selectedAnnoteEl = undefined;
+      };
+        // Handle positioning of the toggle
+    window.addEventListener(
+      "resize",
+      throttle(() => {
+        elRect = undefined;
+        if (selectedAnnoteEl) {
+          selectCodeLines(selectedAnnoteEl);
+        }
+      }, 10)
+    );
+    function throttle(fn, ms) {
+    let throttle = false;
+    let timer;
+      return (...args) => {
+        if(!throttle) { // first call gets through
+            fn.apply(this, args);
+            throttle = true;
+        } else { // all the others get throttled
+            if(timer) clearTimeout(timer); // cancel #2
+            timer = setTimeout(() => {
+              fn.apply(this, args);
+              timer = throttle = false;
+            }, ms);
+        }
+      };
+    }
+      // Attach click handler to the DT
+      const annoteDls = window.document.querySelectorAll('dt[data-target-cell]');
+      for (const annoteDlNode of annoteDls) {
+        annoteDlNode.addEventListener('click', (event) => {
+          const clickedEl = event.target;
+          if (clickedEl !== selectedAnnoteEl) {
+            unselectCodeLines();
+            const activeEl = window.document.querySelector('dt[data-target-cell].code-annotation-active');
+            if (activeEl) {
+              activeEl.classList.remove('code-annotation-active');
+            }
+            selectCodeLines(clickedEl);
+            clickedEl.classList.add('code-annotation-active');
+          } else {
+            // Unselect the line
+            unselectCodeLines();
+            clickedEl.classList.remove('code-annotation-active');
+          }
+        });
+      }
+  const findCites = (el) => {
+    const parentEl = el.parentElement;
+    if (parentEl) {
+      const cites = parentEl.dataset.cites;
+      if (cites) {
+        return {
+          el,
+          cites: cites.split(' ')
+        };
+      } else {
+        return findCites(el.parentElement)
+      }
+    } else {
+      return undefined;
+    }
+  };
+  var bibliorefs = window.document.querySelectorAll('a[role="doc-biblioref"]');
+  for (var i=0; i<bibliorefs.length; i++) {
+    const ref = bibliorefs[i];
+    const citeInfo = findCites(ref);
+    if (citeInfo) {
+      tippyHover(citeInfo.el, function() {
+        var popup = window.document.createElement('div');
+        citeInfo.cites.forEach(function(cite) {
+          var citeDiv = window.document.createElement('div');
+          citeDiv.classList.add('hanging-indent');
+          citeDiv.classList.add('csl-entry');
+          var biblioDiv = window.document.getElementById('ref-' + cite);
+          if (biblioDiv) {
+            citeDiv.innerHTML = biblioDiv.innerHTML;
+          }
+          popup.appendChild(citeDiv);
+        });
+        return popup.innerHTML;
+      });
+    }
+  }
+});
+</script>
+<nav class="page-navigation">
+  <div class="nav-page nav-page-previous">
+      <a href="./preface.html" class="pagination-link" aria-label="Preface">
+        <i class="bi bi-arrow-left-short"></i> <span class="nav-page-text">Preface</span>
+      </a>          
+  </div>
+  <div class="nav-page nav-page-next">
+      <a href="./modelizacion.html" class="pagination-link" aria-label="Conceptos del Proceso de Modelización">
+        <span class="nav-page-text"><span class="chapter-number">2</span>&nbsp; <span class="chapter-title">Conceptos del Proceso de Modelización</span></span> <i class="bi bi-arrow-right-short"></i>
+      </a>
+  </div>
+</nav>
+</div> <!-- /content -->
+
+
+
+
+</body></html>

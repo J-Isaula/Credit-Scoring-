@@ -1,0 +1,907 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en"><head>
+
+<meta charset="utf-8">
+<meta name="generator" content="quarto-1.4.555">
+
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+
+<meta name="description" content="En este artículo, te llevo a conocer la literatura matemática sobre modelos de credit scoring, te presento el detalle sobre el modelo regresión logística y redes neuronales, adicional a ello te detallo las diferentes técnicas empleadas para la validación de estos modelos. Si laboras en la banca, actuaría, estadística, economía o data sciencs este artículo es para ti.">
+
+<title>Credit Scoring - 2&nbsp; Conceptos del Proceso de Modelización</title>
+<style>
+code{white-space: pre-wrap;}
+span.smallcaps{font-variant: small-caps;}
+div.columns{display: flex; gap: min(4vw, 1.5em);}
+div.column{flex: auto; overflow-x: auto;}
+div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+ul.task-list{list-style: none;}
+ul.task-list li input[type="checkbox"] {
+  width: 0.8em;
+  margin: 0 0.8em 0.2em -1em; /* quarto-specific, see https://github.com/quarto-dev/quarto-cli/issues/4556 */ 
+  vertical-align: middle;
+}
+/* CSS for citations */
+div.csl-bib-body { }
+div.csl-entry {
+  clear: both;
+  margin-bottom: 0em;
+}
+.hanging-indent div.csl-entry {
+  margin-left:2em;
+  text-indent:-2em;
+}
+div.csl-left-margin {
+  min-width:2em;
+  float:left;
+}
+div.csl-right-inline {
+  margin-left:2em;
+  padding-left:1em;
+}
+div.csl-indent {
+  margin-left: 2em;
+}</style>
+
+
+<script src="site_libs/quarto-nav/quarto-nav.js"></script>
+<script src="site_libs/quarto-nav/headroom.min.js"></script>
+<script src="site_libs/clipboard/clipboard.min.js"></script>
+<script src="site_libs/quarto-search/autocomplete.umd.js"></script>
+<script src="site_libs/quarto-search/fuse.min.js"></script>
+<script src="site_libs/quarto-search/quarto-search.js"></script>
+<meta name="quarto:offset" content="./">
+<link href="./references.html" rel="next">
+<link href="./modelos.html" rel="prev">
+<link href="./assets/ji.png" rel="icon" type="image/png">
+<script src="site_libs/quarto-html/quarto.js"></script>
+<script src="site_libs/quarto-html/popper.min.js"></script>
+<script src="site_libs/quarto-html/tippy.umd.min.js"></script>
+<script src="site_libs/quarto-html/anchor.min.js"></script>
+<link href="site_libs/quarto-html/tippy.css" rel="stylesheet">
+<link href="site_libs/quarto-html/quarto-syntax-highlighting.css" rel="stylesheet" id="quarto-text-highlighting-styles">
+<script src="site_libs/bootstrap/bootstrap.min.js"></script>
+<link href="site_libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
+<link href="site_libs/bootstrap/bootstrap.min.css" rel="stylesheet" id="quarto-bootstrap" data-mode="light">
+<script id="quarto-search-options" type="application/json">{
+  "location": "sidebar",
+  "copy-button": false,
+  "collapse-after": 3,
+  "panel-placement": "start",
+  "type": "textbox",
+  "limit": 50,
+  "keyboard-shortcut": [
+    "f",
+    "/",
+    "s"
+  ],
+  "show-item-context": false,
+  "language": {
+    "search-no-results-text": "No results",
+    "search-matching-documents-text": "matching documents",
+    "search-copy-link-title": "Copy link to search",
+    "search-hide-matches-text": "Hide additional matches",
+    "search-more-match-text": "more match in this document",
+    "search-more-matches-text": "more matches in this document",
+    "search-clear-button-title": "Clear",
+    "search-text-placeholder": "",
+    "search-detached-cancel-button-title": "Cancel",
+    "search-submit-button-title": "Submit",
+    "search-label": "Search"
+  }
+}</script>
+
+  <script src="https://polyfill.io/v3/polyfill.min.js?features=es6"></script>
+  <script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml-full.js" type="text/javascript"></script>
+
+<script type="text/javascript">
+const typesetMath = (el) => {
+  if (window.MathJax) {
+    // MathJax Typeset
+    window.MathJax.typeset([el]);
+  } else if (window.katex) {
+    // KaTeX Render
+    var mathElements = el.getElementsByClassName("math");
+    var macros = [];
+    for (var i = 0; i < mathElements.length; i++) {
+      var texText = mathElements[i].firstChild;
+      if (mathElements[i].tagName == "SPAN") {
+        window.katex.render(texText.data, mathElements[i], {
+          displayMode: mathElements[i].classList.contains('display'),
+          throwOnError: false,
+          macros: macros,
+          fleqn: false
+        });
+      }
+    }
+  }
+}
+window.Quarto = {
+  typesetMath
+};
+</script>
+
+</head>
+
+<body class="nav-sidebar floating">
+
+<div id="quarto-search-results"></div>
+  <header id="quarto-header" class="headroom fixed-top">
+  <nav class="quarto-secondary-nav">
+    <div class="container-fluid d-flex">
+      <button type="button" class="quarto-btn-toggle btn" data-bs-toggle="collapse" data-bs-target=".quarto-sidebar-collapse-item" aria-controls="quarto-sidebar" aria-expanded="false" aria-label="Toggle sidebar navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">
+        <i class="bi bi-layout-text-sidebar-reverse"></i>
+      </button>
+        <nav class="quarto-page-breadcrumbs" aria-label="breadcrumb"><ol class="breadcrumb"><li class="breadcrumb-item"><a href="./modelizacion.html"><span class="chapter-number">2</span>&nbsp; <span class="chapter-title">Conceptos del Proceso de Modelización</span></a></li></ol></nav>
+        <a class="flex-grow-1" role="button" data-bs-toggle="collapse" data-bs-target=".quarto-sidebar-collapse-item" aria-controls="quarto-sidebar" aria-expanded="false" aria-label="Toggle sidebar navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">      
+        </a>
+      <button type="button" class="btn quarto-search-button" aria-label="" onclick="window.quartoOpenSearch();">
+        <i class="bi bi-search"></i>
+      </button>
+    </div>
+  </nav>
+</header>
+<!-- content -->
+<div id="quarto-content" class="quarto-container page-columns page-rows-contents page-layout-article">
+<!-- sidebar -->
+  <nav id="quarto-sidebar" class="sidebar collapse collapse-horizontal quarto-sidebar-collapse-item sidebar-navigation floating overflow-auto">
+    <div class="pt-lg-2 mt-2 text-left sidebar-header sidebar-header-stacked">
+      <a href="./index.html" class="sidebar-logo-link">
+      <img src="./assets/mifoto.jpeg" alt="" class="sidebar-logo py-0 d-lg-inline d-none">
+      </a>
+    <div class="sidebar-title mb-0 py-0">
+      <a href="./">Credit Scoring</a> 
+        <div class="sidebar-tools-main tools-wide">
+    <a href="https://github.com/J-Isaula" title="Source Code" class="quarto-navigation-tool px-1" aria-label="Source Code"><i class="bi bi-github"></i></a>
+    <div class="dropdown">
+      <a href="" title="Share" id="quarto-navigation-tool-dropdown-0" class="quarto-navigation-tool dropdown-toggle px-1" data-bs-toggle="dropdown" aria-expanded="false" aria-label="Share"><i class="bi bi-share"></i></a>
+      <ul class="dropdown-menu" aria-labelledby="quarto-navigation-tool-dropdown-0">
+          <li>
+            <a class="dropdown-item sidebar-tools-main-item" href="https://twitter.com/intent/tweet?url=|url|">
+              <i class="bi bi-bi-twitter pe-1"></i>
+            Twitter
+            </a>
+          </li>
+          <li>
+            <a class="dropdown-item sidebar-tools-main-item" href="https://www.linkedin.com/sharing/share-offsite/?url=|url|">
+              <i class="bi bi-bi-linkedin pe-1"></i>
+            LinkedIn
+            </a>
+          </li>
+      </ul>
+    </div>
+  <a href="" class="quarto-reader-toggle quarto-navigation-tool px-1" onclick="window.quartoToggleReader(); return false;" title="Toggle reader mode">
+  <div class="quarto-reader-toggle-btn">
+  <i class="bi"></i>
+  </div>
+</a>
+</div>
+    </div>
+      </div>
+        <div class="mt-2 flex-shrink-0 align-items-center">
+        <div class="sidebar-search">
+        <div id="quarto-search" class="" title="Search"></div>
+        </div>
+        </div>
+    <div class="sidebar-menu-container"> 
+    <ul class="list-unstyled mt-1">
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./index.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Welcome</span></a>
+  </div>
+</li>
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./preface.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Preface</span></a>
+  </div>
+</li>
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./modelos.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">1</span>&nbsp; <span class="chapter-title">Modelos Credit Scoring</span></span></a>
+  </div>
+</li>
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./modelizacion.html" class="sidebar-item-text sidebar-link active">
+ <span class="menu-text"><span class="chapter-number">2</span>&nbsp; <span class="chapter-title">Conceptos del Proceso de Modelización</span></span></a>
+  </div>
+</li>
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./references.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">References</span></a>
+  </div>
+</li>
+    </ul>
+    </div>
+</nav>
+<div id="quarto-sidebar-glass" class="quarto-sidebar-collapse-item" data-bs-toggle="collapse" data-bs-target=".quarto-sidebar-collapse-item"></div>
+<!-- margin-sidebar -->
+    <div id="quarto-margin-sidebar" class="sidebar margin-sidebar">
+        <nav id="TOC" role="doc-toc" class="toc-active">
+    <h2 id="toc-title">Table of contents</h2>
+   
+  <ul>
+  <li><a href="#prueba-dickey---fuller-aumentada" id="toc-prueba-dickey---fuller-aumentada" class="nav-link active" data-scroll-target="#prueba-dickey---fuller-aumentada"><span class="header-section-number">2.1</span> Prueba Dickey - Fuller aumentada</a></li>
+  <li><a href="#muestreo-aleatorio-simple" id="toc-muestreo-aleatorio-simple" class="nav-link" data-scroll-target="#muestreo-aleatorio-simple"><span class="header-section-number">2.2</span> Muestreo Aleatorio Simple</a></li>
+  <li><a href="#roll-rate" id="toc-roll-rate" class="nav-link" data-scroll-target="#roll-rate"><span class="header-section-number">2.3</span> Roll Rate</a></li>
+  <li><a href="#valor-de-información-iv" id="toc-valor-de-información-iv" class="nav-link" data-scroll-target="#valor-de-información-iv"><span class="header-section-number">2.4</span> Valor de Información (IV)</a></li>
+  <li><a href="#backward-stepwise-y-criterio-de-información-de-akaike-aic" id="toc-backward-stepwise-y-criterio-de-información-de-akaike-aic" class="nav-link" data-scroll-target="#backward-stepwise-y-criterio-de-información-de-akaike-aic"><span class="header-section-number">2.5</span> Backward Stepwise y Criterio de Información de Akaike (AIC)</a></li>
+  <li><a href="#estadístico-de-wald" id="toc-estadístico-de-wald" class="nav-link" data-scroll-target="#estadístico-de-wald"><span class="header-section-number">2.6</span> Estadístico de Wald</a></li>
+  <li><a href="#gvif-factor-de-inflación-de-la-varianza-generalizado" id="toc-gvif-factor-de-inflación-de-la-varianza-generalizado" class="nav-link" data-scroll-target="#gvif-factor-de-inflación-de-la-varianza-generalizado"><span class="header-section-number">2.7</span> GVIF: Factor de inflación de la varianza generalizado</a></li>
+  <li><a href="#estadístico-de-kolmogorov---smirnov-ks" id="toc-estadístico-de-kolmogorov---smirnov-ks" class="nav-link" data-scroll-target="#estadístico-de-kolmogorov---smirnov-ks"><span class="header-section-number">2.8</span> Estadístico de Kolmogorov - Smirnov (KS)</a></li>
+  <li><a href="#coeficiente-de-gini" id="toc-coeficiente-de-gini" class="nav-link" data-scroll-target="#coeficiente-de-gini"><span class="header-section-number">2.9</span> Coeficiente de GINI</a></li>
+  <li><a href="#matriz-de-confusión-error-sensibilidad-y-especificidad" id="toc-matriz-de-confusión-error-sensibilidad-y-especificidad" class="nav-link" data-scroll-target="#matriz-de-confusión-error-sensibilidad-y-especificidad"><span class="header-section-number">2.10</span> Matriz de confusión: error, sensibilidad y especificidad</a></li>
+  <li><a href="#estadístico-auroc" id="toc-estadístico-auroc" class="nav-link" data-scroll-target="#estadístico-auroc"><span class="header-section-number">2.11</span> Estadístico AUROC</a></li>
+  </ul>
+</nav>
+    </div>
+<!-- main -->
+<main class="content" id="quarto-document-content">
+
+<header id="title-block-header" class="quarto-title-block default">
+<div class="quarto-title">
+<h1 class="title"><span class="chapter-number">2</span>&nbsp; <span class="chapter-title">Conceptos del Proceso de Modelización</span></h1>
+</div>
+
+
+
+<div class="quarto-title-meta">
+
+    
+  
+    
+  </div>
+  
+
+
+</header>
+
+
+<p>Para la construcción de los modelos <code>scoring,</code> ya sea con el uso de <code>regresión logística</code> o r<code>edes neuronales</code>, es necesario definir algunos conceptos.</p>
+<section id="prueba-dickey---fuller-aumentada" class="level2" data-number="2.1">
+<h2 data-number="2.1" class="anchored" data-anchor-id="prueba-dickey---fuller-aumentada"><span class="header-section-number">2.1</span> Prueba Dickey - Fuller aumentada</h2>
+<p>La prueba de Dickey - Fuller aumentada permite corroborar la estacionariedad de una serie de tiempo. Cuando una serie no estacionaria presenta al menos una raíz unitaria, por lo que se busca contrastar la siguiente hipótesis <span class="citation" data-cites="Santos">(<a href="references.html#ref-Santos" role="doc-biblioref">Santos 2008</a>)</span>:</p>
+<ul>
+<li><p><span class="math inline">\(H_0:\)</span> la serie tiene raíz unitaria</p></li>
+<li><p><span class="math inline">\(H_a:\)</span> la serie es estacionaria</p></li>
+</ul>
+<p>Se rechaza <span class="math inline">\(H_0\)</span> si:</p>
+<p>Valor absoluto (Estadístico de la prueba (ADF)) <span class="math inline">\(&gt;\)</span> valores críticos de la prueba <span class="math inline">\((1\%, 5\%, 10\%)\)</span>.</p>
+</section>
+<section id="muestreo-aleatorio-simple" class="level2" data-number="2.2">
+<h2 data-number="2.2" class="anchored" data-anchor-id="muestreo-aleatorio-simple"><span class="header-section-number">2.2</span> Muestreo Aleatorio Simple</h2>
+<p>El tamaño de muestra es necesario para estimar <span class="math inline">\(p\)</span> (proporción poblacional) con un límite para el error de estimación <span class="math inline">\(B\)</span>, está dado por <span class="citation" data-cites="Scheaffer">(<a href="references.html#ref-Scheaffer" role="doc-biblioref">Scheaffer 2013</a>)</span>:</p>
+<p><span class="math display">\[
+n = \frac{Npq}{(N - 1)D + pq} ~ donde: ~ q = 1 - p ~ y ~ D = \frac{B^2}{4}
+\]</span></p>
+</section>
+<section id="roll-rate" class="level2" data-number="2.3">
+<h2 data-number="2.3" class="anchored" data-anchor-id="roll-rate"><span class="header-section-number">2.3</span> Roll Rate</h2>
+<p>Implica comparar el peor atraso en un <span class="math inline">\(X\)</span> número de meses, con los posteriores <span class="math inline">\(X\)</span> meses. Y así, calcular el porcentaje de operaciones o clientes que mantienen, mejoran o empeoran su comportamiento, en distintos rangos de atraso. El propósito es identificar el punto de no retorno: es decir, el nivel de atraso en el cual, una operación es considerada como insalvable <span class="citation" data-cites="Siddiqi">(<a href="references.html#ref-Siddiqi" role="doc-biblioref">Siddiqi 2006</a>)</span>.</p>
+</section>
+<section id="valor-de-información-iv" class="level2" data-number="2.4">
+<h2 data-number="2.4" class="anchored" data-anchor-id="valor-de-información-iv"><span class="header-section-number">2.4</span> Valor de Información (IV)</h2>
+<p>El valor de información es un valor numérico que permite cuantificar el poder de predicción de una variable independiente. El mismo, funciona con variables categóricas. Se calcula a partir de la siguiente expresión:</p>
+<p><span class="math display">\[
+IV = \sum_{i=1}^n \left(\begin{array}{c}\frac{b_i}{b} - \frac{m_i}{m}\end{array}\right) \times \ln \left(\begin{array}{c}\frac{b_i/b}{m_i/m}\end{array}\right)
+\]</span></p>
+<p>Donde, <span class="math inline">\(n\)</span> es el número de categorías en la variable independiente, <span class="math inline">\(b_i\)</span> y <span class="math inline">\(m_i\)</span> es el número de buenos y malos clientes dentro de la categoría <span class="math inline">\(i\)</span>. Y <span class="math inline">\(b\)</span> y <span class="math inline">\(m\)</span>: el número total de buenos y malos clientes en el periodo de modelo, respectivamente.</p>
+<p>Intuitivamente, mientras más grande sea el valor de IV, más predictiva será la variable independiente categorizada. Sin embargo, las variables con valores superiores a 0.5 deberían ser revisadas pues puede darse el caso de sobreestimación <span class="citation" data-cites="Siddiqi">(<a href="references.html#ref-Siddiqi" role="doc-biblioref">Siddiqi 2006</a>)</span>.</p>
+<p>Una regla propuesta por <span class="citation" data-cites="Siddiqi">(<a href="references.html#ref-Siddiqi" role="doc-biblioref">Siddiqi 2006</a>)</span></p>
+<table class="caption-top table">
+<caption>Regla valor de información IV</caption>
+<thead>
+<tr class="header">
+<th>Valor IV</th>
+<th>Nivel de Predicción</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td><span class="math inline">\(IV &lt; 0.02\)</span></td>
+<td>No predictivo</td>
+</tr>
+<tr class="even">
+<td><span class="math inline">\(0.02 ≤ IV ≤ 0.1\)</span></td>
+<td>Débil</td>
+</tr>
+<tr class="odd">
+<td><span class="math inline">\(0.1 ≤ IV ≤ 0.3\)</span></td>
+<td>Medio</td>
+</tr>
+<tr class="even">
+<td><span class="math inline">\(IV &gt; 0.3\)</span></td>
+<td>Fuerte</td>
+</tr>
+</tbody>
+</table>
+</section>
+<section id="backward-stepwise-y-criterio-de-información-de-akaike-aic" class="level2" data-number="2.5">
+<h2 data-number="2.5" class="anchored" data-anchor-id="backward-stepwise-y-criterio-de-información-de-akaike-aic"><span class="header-section-number">2.5</span> Backward Stepwise y Criterio de Información de Akaike (AIC)</h2>
+<p>La técnica de pasos hacia atras (Backward Stepwise) consiste en introducir en el modelo todas las variables e ir excluyendo una tras otra según algún criterio de evaluación <span class="citation" data-cites="Moral">(<a href="references.html#ref-Moral" role="doc-biblioref">Moral 2006</a>)</span>. En este caso, se utiliza el AIC como críterio de selección de variables, considerando aquellas que logren el menor valor de AIC.</p>
+<p>El criterio de información de Akaike penaliza los modelos con muchos parámetros y busca determinar la significancia de incluir algunos parámetros en el modelo <span class="citation" data-cites="Sanchez">(<a href="references.html#ref-Sanchez" role="doc-biblioref">Sanchez 2012</a>)</span>. Este criterio se define como sigue:</p>
+<p>Para un conjunto de <span class="math inline">\(m\)</span> modelos, de tal forma que,</p>
+<p><span class="math display">\[
+M_j^m \supset M_{j-1}^{m-1} \supset . . . \supset M_{j-i}^1
+\]</span></p>
+<p>Donde, <span class="math inline">\(j &gt; i\)</span>, <span class="math inline">\(i &gt; 0\)</span> y los subíndices denotan el número de variables en cada modelo. Se busca elegir aquel valor de <span class="math inline">\(j\)</span> que minimice la siguiente expresión,</p>
+<p><span class="math display">\[
+AIC = -2\log L + 2k
+\]</span></p>
+<p>Siendo, <span class="math inline">\(L\)</span> es la función de <code>máxima verosimilitud</code>, que se define como:</p>
+<p><span class="math display">\[
+L = -\frac{n}{2}\log 2\pi - \frac{n}{2}\log \sigma^2 - \frac{1}{2}\sum_{t=1}^n \frac{e_t^2}{\sigma^2}
+\]</span></p>
+<p>Donde, <span class="math inline">\(k\)</span> es igual al número de parámetros del modelo, <span class="math inline">\(n\)</span> corresponde al número de datos para la construcción de este y <span class="math inline">\(\sigma^2\)</span> el promedio de los residuales <span class="math inline">\(e_t\)</span> al cuadrado. Como se puede observar, AIC penaliza modelos según su desviación de los datos reales, siendo el mejor modelo aque que manifieste el valor más pequeño entre todos los modelos evaluados, siendo este el que mejor ajusta a los datos <span class="citation" data-cites="Sanchez">(<a href="references.html#ref-Sanchez" role="doc-biblioref">Sanchez 2012</a>)</span>.</p>
+</section>
+<section id="estadístico-de-wald" class="level2" data-number="2.6">
+<h2 data-number="2.6" class="anchored" data-anchor-id="estadístico-de-wald"><span class="header-section-number">2.6</span> Estadístico de Wald</h2>
+<p>Para corroborar la significancia de los coeficientes de un modelo logit, se contrasta la siguiente hipótesis nula:</p>
+<p><span class="math display">\[
+H_0: \beta_i = 0
+\]</span>Considerando a <span class="math inline">\(\beta_i\)</span> como el coeficiente estimado correspondiente a la variable independient <span class="math inline">\(x_i\)</span>.</p>
+<p>Así, se cuenta con el estadístico de Wald <span class="citation" data-cites="Wasserman">(<a href="references.html#ref-Wasserman" role="doc-biblioref">Wasserman 2010</a>)</span>: Sea <span class="math inline">\(\theta\)</span> un parámetro escalar, <span class="math inline">\(\hat{\theta}\)</span> un estimador de <span class="math inline">\(\theta\)</span> y sea <span class="math inline">\(\hat{se}\)</span> el error estándar estimado de <span class="math inline">\(\hat{\theta}\)</span>. Considerar probar <span class="math inline">\(H_0: \theta = \theta_0\)</span> vs <span class="math inline">\(H_1: \theta ≠ \theta_0\)</span>. Se asume que <span class="math inline">\(\hat{\theta}\)</span> es asintoticamente normal,</p>
+<p><span class="math display">\[
+\frac{\sqrt{n}(\hat{\theta} - \theta_0)}{\hat{se}} \longrightarrow N(0,1)
+\]</span></p>
+<p>Con un nivel de significancia de <span class="math inline">\(\alpha\)</span>, la prueba de Wald establece: Se rechaza <span class="math inline">\(H_0\)</span> cuando <span class="math inline">\(|W| &gt; z_{\alpha/2}\)</span> donde,</p>
+<p><span class="math display">\[
+W = \frac{\hat{\theta} - \theta_0}{\hat{se}}
+\]</span></p>
+<p>En este caso, <span class="math inline">\(\theta_0 = 0\)</span>, por lo cual el estadístico de Wald se simplifica a</p>
+<p><span class="math display">\[
+W = \frac{\hat{\beta}}{\hat{se}}
+\]</span></p>
+</section>
+<section id="gvif-factor-de-inflación-de-la-varianza-generalizado" class="level2" data-number="2.7">
+<h2 data-number="2.7" class="anchored" data-anchor-id="gvif-factor-de-inflación-de-la-varianza-generalizado"><span class="header-section-number">2.7</span> GVIF: Factor de inflación de la varianza generalizado</h2>
+<p>GVIF es una medida de cuanto de la varianza del coeficiente estimado <span class="math inline">\(\beta_j\)</span> está inflado por la existencia de correlación entre las variables independientes del modelo. Se usa comúnmente cuando se tiene variables categóricas con más de dos valores posibles o con variables polinomiales <span class="citation" data-cites="Fox">(<a href="references.html#ref-Fox" role="doc-biblioref">Fox 2003</a>)</span>, está dado por,</p>
+<p><span class="math display">\[
+GVIF_i = \frac{\det R_i \times \det R_{-i}}{\det R}
+\]</span></p>
+<p>Siendo <span class="math inline">\(\det R_i\)</span> el determinante de la matriz de correlación sobre las columnas de la variable <span class="math inline">\(i\)</span>, <span class="math inline">\(\det R_{-i}\)</span> el determinante de la matriz de correlación sobre las columnas del resto de variables del modelo, distintas a la variable <span class="math inline">\(i\)</span> y <span class="math inline">\(\det R\)</span> el determinante de la matriz completa de correlación. Cuando el número de coeficientes de cada variable es uno, el GVIF coincide con VIF (factor de inflación de la varianza $1/(1-R_i^2), siendo ~ <span class="math inline">\(R^2\)</span> ~ el ~ coeficiente ~ de ~ determinacón)$. A pesar, de no tener una regla formal, generalmente se acepta que valores de GVIF superiores a 10 puede ser perjudicial <span class="citation" data-cites="Yoo">(<a href="references.html#ref-Yoo" role="doc-biblioref">Yoo 2014</a>)</span>.</p>
+</section>
+<section id="estadístico-de-kolmogorov---smirnov-ks" class="level2" data-number="2.8">
+<h2 data-number="2.8" class="anchored" data-anchor-id="estadístico-de-kolmogorov---smirnov-ks"><span class="header-section-number">2.8</span> Estadístico de Kolmogorov - Smirnov (KS)</h2>
+<p>El estadístico de Kolmogorov Smirnov consiste en medir cuan distintas son las funciones de distribución de buenos y malos clientes para cada valor de puntaje score.</p>
+<p>El valor del estadístico está dado por <span class="citation" data-cites="Rezac">(<a href="references.html#ref-Rezac" role="doc-biblioref">Rezac 2011</a>)</span>,</p>
+<p><span class="math display">\[
+KS = \max\left(\begin{array}{c}P_b(i) - P_g(i)\end{array}\right)
+\]</span></p>
+<p>Donde:</p>
+<p><span class="math inline">\(\textbf{i}:\)</span> es el valor de score, en el rango <span class="math inline">\(L - H\)</span>, que es, <span class="math inline">\(L ≤ i ≤ H\)</span>.</p>
+<p><span class="math inline">\(\textbf{P}_\textbf{g}(\textbf{i})\)</span>, <span class="math inline">\(\textbf{P}_\textbf{b}(\textbf{i}):\)</span> Proporción de buenos y malos con score menor o igual a <span class="math inline">\(i\)</span>, en la población.</p>
+<p><span class="math display">\[
+P_g(i) = \frac{N_g(i)}{N_g} = \sum_{j = L}^i p_g(j)
+\]</span></p>
+<p><span class="math display">\[
+P_b(i) = \frac{N_b(i)}{N_b} = \sum_{j = L}^i p_b(j)
+\]</span></p>
+<p>Con:</p>
+<p><span class="math inline">\(N_g:\)</span> El total de buenos en la población.</p>
+<p><span class="math inline">\(N_b:\)</span> El total de malos en la población.</p>
+<p><span class="math inline">\(N_g(i), N_b(i):\)</span> El número de buenos y malos en la población con scores menores o iguales a <span class="math inline">\(i\)</span>.</p>
+<p><span class="math display">\[
+N_g(i) = \sum_{j = L}^{i} n_g(j)
+\]</span></p>
+<p><span class="math display">\[
+N_b(i) = \sum_{j=L}^i n_b(j)
+\]</span></p>
+<p><span class="math inline">\(p_g(i), p_b(i):\)</span> Es la proporción de buenos con score <span class="math inline">\(i\)</span> y malos con score <span class="math inline">\(i\)</span> en la población.</p>
+<p><span class="math display">\[
+p_g(i) = \frac{n_g(i)}{N_g}\hspace{1cm} \frac{n_b(i)}{N_b}
+\]</span></p>
+<p>Finalmente, <span class="math inline">\(n_g(i)\)</span> y <span class="math inline">\(n_b(i)\)</span> el número de buenos casos y malos con score <span class="math inline">\(i\)</span>, en una población.</p>
+<p>El estadístico puede ser usado para medir la capacidad de clasificiación de un modelo, tomando valores entre 0 y 1. Se considera que un modelo con un KS menor a 20% debe ser cuestionado y mayor a 70% sea, probablemente, muy bueno para ser cierto.</p>
+</section>
+<section id="coeficiente-de-gini" class="level2" data-number="2.9">
+<h2 data-number="2.9" class="anchored" data-anchor-id="coeficiente-de-gini"><span class="header-section-number">2.9</span> Coeficiente de GINI</h2>
+<p>El coeficiente de GINI es un estadístico usado para medir cuan bien el modelo scoring distingue entre los buenos y malos clientes, toma valores entre 0 y 1, considerando que, si el coeficiente de Gini es igual a 1, entonces el modelo separa perfectamente a bueno y malos.</p>
+<p>El estadístico está dado por la siguiente ecuación:</p>
+<p><span class="math display">\[
+Gini = 1 - \sum_{i = L}^{H^{\prime}} \left(\begin{array}{c}P_b(i+1) - P_b(i)\end{array}\right)\left(\begin{array}{c}P_g(i+1) + P_g(i)\end{array}\right)  
+\]</span></p>
+<p>Donde:</p>
+<p><span class="math inline">\(\textbf{i}:\)</span> es el valor de score, en el rango <span class="math inline">\(L - H\)</span>, que es, <span class="math inline">\(L ≤ i ≤ H\)</span>.</p>
+<p><span class="math inline">\(\textbf{P}_\textbf{g}(\textbf{i}), \textbf{P}_\textbf{b}(\textbf{i}):\)</span> Proporción de buenos y malos con score menor o igual a <span class="math inline">\(i\)</span>, en la población, respectivamente.</p>
+<p>Se considera que para modelos de originación, un coeficiente de Gini menor a 35% es sospechoso y mayor a 50% es más que satisfactorio.</p>
+</section>
+<section id="matriz-de-confusión-error-sensibilidad-y-especificidad" class="level2" data-number="2.10">
+<h2 data-number="2.10" class="anchored" data-anchor-id="matriz-de-confusión-error-sensibilidad-y-especificidad"><span class="header-section-number">2.10</span> Matriz de confusión: error, sensibilidad y especificidad</h2>
+<p>Una forma simple de evaluar la predictividad de un modelo, es calculando el porcentaje de clientes que este clasifica de forma correcta. Este porcentaje de clasificación es derivado, de la matriz de confusión, la cual es construida de la siguiente forma:</p>
+<ul>
+<li><p>Elegir un punto de corte, para los valores de score obtenidos.</p></li>
+<li><p>Clasificar a todas las operaciones o clientes con un valor de score por debajo del punto de corte, como malos esperados. Y a los que tiene un valor de score por encima del punto de corte, como buenos esperados.</p></li>
+<li><p>Construir una tabla cruzada entre la clasificación real u original de bueno/malo y la de bueno/malo esperado, obtenida en el paso anterior.</p></li>
+<li><p>Calcular las diferentes ratios que pueden ser obtenidos del modelo, como error, valor de sensibilidad y especificidad.</p></li>
+</ul>
+<p>Los casos correctamente clasificados son denominados como verdaderos positivos (buenos) y verdaderos negativos (malos). Si no son bien clasificados se tiene a los falsos positivos (malos que son clasificados como buenos) y a los falsos negativos (buenos que son clasificados como malos).</p>
+<p>Además, se define como <code>sensibilidad y especificidad</code>, a la habilidad del modelo de catalogar correctamente al cliente bueno y malo, respectivamente. La forma general de la matriz de confusión es mostrada en la siguiente tabla:</p>
+<p><img src="matriz_conf.png" class="img-fluid"></p>
+<p>Y en la siguiente tabla se expone los indicadores de eficiencia, que serán usados para comparar los modelos desarrollados, construidos a partir de la matriz de confusión.</p>
+<p><img src="indicadores_ef.png" class="img-fluid"></p>
+<p>Una forma de obtener el punto de corte que permita nivelar la predicción correcta de buenos y malos es hacer uso del índice de <code>Youden</code>, que está dado por:</p>
+<p><span class="math display">\[
+indice~de~Youden(YI) = \max(Sensibilidad + Especificidad -  1)
+\]</span></p>
+<p>En una curva <code>ROC</code>, que será definida en el siguiente apartado, el índice de Youden es la distancia vertical máxima ente la curva y la diagonal. Siendo el punto de corte óptimo, aquel en el cual se alcanza el valor de YI <span class="citation" data-cites="Cadarso">(<a href="references.html#ref-Cadarso" role="doc-biblioref">Cadarso Suárez 2010</a>)</span> .</p>
+</section>
+<section id="estadístico-auroc" class="level2" data-number="2.11">
+<h2 data-number="2.11" class="anchored" data-anchor-id="estadístico-auroc"><span class="header-section-number">2.11</span> Estadístico AUROC</h2>
+<p>Es una medida de performance cercanamente relacionada al coeficiente Gini y midel el área entre la curva y la diagonal conformada en la gráfica de sensibilidad vs (1 - especificidad), comúnmente llamada Curva ROC, para el total de los valores de probabilidad. Permite medir la eficacia predictiva de un modelo, evaluando gráficamente la capacidad de este para discriminar entre buenos y malos.</p>
+<p>La relación entre el estadístico AUROC y el coeficiente de Gini es el que se muestra a continuación <span class="citation" data-cites="D.Handall">Till (<a href="references.html#ref-D.Handall" role="doc-biblioref">2001</a>)</span></p>
+<p><span class="math display">\[
+AUROC = \frac{Gini + 1}{2}
+\]</span></p>
+<p>El valor de AUROC varía entre 0 y 1. Un valor de 0.5 implicaría que el modelo es igual a hacer una clasificación aleatoria para catalogar a un cliente como bueno o malo, un valor de 1 significa que las clasificaciones son perfectamente correctas y un valor de 0 implica que las mismas son totalmente incorrectas. Tal como expresa <span class="citation" data-cites="Siddiqi">(<a href="references.html#ref-Siddiqi" role="doc-biblioref">Siddiqi 2006</a>)</span> el valor del estadístico AUROC deber estar entre 0.5, y un valor superior a 0.7 se considera adecuado.</p>
+
+
+<div id="refs" class="references csl-bib-body hanging-indent" data-entry-spacing="0" role="list" style="display: none">
+<div id="ref-Cadarso" class="csl-entry" role="listitem">
+Cadarso Suárez, Carmen Maria. 2010. <em>Metodología ROC En La Evaluación de Medidas Antropométricas Como Marcadores de La Hipertensión Arterial</em>. Universidad de Santiago de Compostela.
+</div>
+<div id="ref-Fox" class="csl-entry" role="listitem">
+Fox, John. 2003. <em>Linear Models Problems</em>. Canada: McMaster Universrity.
+</div>
+<div id="ref-Moral" class="csl-entry" role="listitem">
+Moral, Irene. 2006. <em>Modelos de Regresión: Lineal Simple y Regresión Logística</em>. Revista Seden, el 3 de diciembre de 2006.
+</div>
+<div id="ref-Rezac" class="csl-entry" role="listitem">
+Rezac, y František Řezáč, Martin. 2011. <em>How to Measure the Quality of Credit Scoring Models</em>. Czech Journal of Economics; Finance.
+</div>
+<div id="ref-Sanchez" class="csl-entry" role="listitem">
+Sanchez, Paola. 2012. <em>Una Nueva Metodología de Entrenamiento de Redes Neuronales y Sus Implicaciones En La Seleción de Modelos</em>. Universidad Nacional de Colombia.
+</div>
+<div id="ref-Santos" class="csl-entry" role="listitem">
+Santos, Holger Capa. 2008. <em>Un Primer Curso En Series Temporales</em>. Primera. Quito.
+</div>
+<div id="ref-Scheaffer" class="csl-entry" role="listitem">
+Scheaffer, William Mendenhall, Richard L. 2013. <em>Elementos de Muestreo</em>. Madrid (España): Paraninfo.
+</div>
+<div id="ref-Siddiqi" class="csl-entry" role="listitem">
+Siddiqi, Naeem. 2006. <em>Credit Risk Scorecards: Developing and Implementing Intelligent Credit Scoring.</em> Hoboken. N. J: Wiley.
+</div>
+<div id="ref-D.Handall" class="csl-entry" role="listitem">
+Till, D. Handall y. 2001. <em><span>“Statistical Classification Methods in Consumer CreditScoring: A Review”</span></em>. Journal of the Royal Statistical Society. Series A (Statistics in Society).
+</div>
+<div id="ref-Wasserman" class="csl-entry" role="listitem">
+Wasserman, Larry. 2010. <em>All of Statistics: A Concise Course in Statistical Inference</em>. Springer Publishing Company, Incorporated.
+</div>
+<div id="ref-Yoo" class="csl-entry" role="listitem">
+Yoo, Robert Mayberry, Wonsuk. 2014. <em>A Study of Effects of MultiCollinearity in the Multivariable Analysis</em>. International Journal of applied science; technology.
+</div>
+</div>
+</section>
+
+</main> <!-- /main -->
+<script id="quarto-html-after-body" type="application/javascript">
+window.document.addEventListener("DOMContentLoaded", function (event) {
+  const toggleBodyColorMode = (bsSheetEl) => {
+    const mode = bsSheetEl.getAttribute("data-mode");
+    const bodyEl = window.document.querySelector("body");
+    if (mode === "dark") {
+      bodyEl.classList.add("quarto-dark");
+      bodyEl.classList.remove("quarto-light");
+    } else {
+      bodyEl.classList.add("quarto-light");
+      bodyEl.classList.remove("quarto-dark");
+    }
+  }
+  const toggleBodyColorPrimary = () => {
+    const bsSheetEl = window.document.querySelector("link#quarto-bootstrap");
+    if (bsSheetEl) {
+      toggleBodyColorMode(bsSheetEl);
+    }
+  }
+  toggleBodyColorPrimary();  
+  const icon = "";
+  const anchorJS = new window.AnchorJS();
+  anchorJS.options = {
+    placement: 'right',
+    icon: icon
+  };
+  anchorJS.add('.anchored');
+  const isCodeAnnotation = (el) => {
+    for (const clz of el.classList) {
+      if (clz.startsWith('code-annotation-')) {                     
+        return true;
+      }
+    }
+    return false;
+  }
+  const clipboard = new window.ClipboardJS('.code-copy-button', {
+    text: function(trigger) {
+      const codeEl = trigger.previousElementSibling.cloneNode(true);
+      for (const childEl of codeEl.children) {
+        if (isCodeAnnotation(childEl)) {
+          childEl.remove();
+        }
+      }
+      return codeEl.innerText;
+    }
+  });
+  clipboard.on('success', function(e) {
+    // button target
+    const button = e.trigger;
+    // don't keep focus
+    button.blur();
+    // flash "checked"
+    button.classList.add('code-copy-button-checked');
+    var currentTitle = button.getAttribute("title");
+    button.setAttribute("title", "Copied!");
+    let tooltip;
+    if (window.bootstrap) {
+      button.setAttribute("data-bs-toggle", "tooltip");
+      button.setAttribute("data-bs-placement", "left");
+      button.setAttribute("data-bs-title", "Copied!");
+      tooltip = new bootstrap.Tooltip(button, 
+        { trigger: "manual", 
+          customClass: "code-copy-button-tooltip",
+          offset: [0, -8]});
+      tooltip.show();    
+    }
+    setTimeout(function() {
+      if (tooltip) {
+        tooltip.hide();
+        button.removeAttribute("data-bs-title");
+        button.removeAttribute("data-bs-toggle");
+        button.removeAttribute("data-bs-placement");
+      }
+      button.setAttribute("title", currentTitle);
+      button.classList.remove('code-copy-button-checked');
+    }, 1000);
+    // clear code selection
+    e.clearSelection();
+  });
+    var localhostRegex = new RegExp(/^(?:http|https):\/\/localhost\:?[0-9]*\//);
+    var mailtoRegex = new RegExp(/^mailto:/);
+      var filterRegex = new RegExp("https:\/\/j-isaula\.github\.io\/website_ji\/");
+    var isInternal = (href) => {
+        return filterRegex.test(href) || localhostRegex.test(href) || mailtoRegex.test(href);
+    }
+    // Inspect non-navigation links and adorn them if external
+ 	var links = window.document.querySelectorAll('a[href]:not(.nav-link):not(.navbar-brand):not(.toc-action):not(.sidebar-link):not(.sidebar-item-toggle):not(.pagination-link):not(.no-external):not([aria-hidden]):not(.dropdown-item):not(.quarto-navigation-tool)');
+    for (var i=0; i<links.length; i++) {
+      const link = links[i];
+      if (!isInternal(link.href)) {
+        // undo the damage that might have been done by quarto-nav.js in the case of
+        // links that we want to consider external
+        if (link.dataset.originalHref !== undefined) {
+          link.href = link.dataset.originalHref;
+        }
+      }
+    }
+  function tippyHover(el, contentFn, onTriggerFn, onUntriggerFn) {
+    const config = {
+      allowHTML: true,
+      maxWidth: 500,
+      delay: 100,
+      arrow: false,
+      appendTo: function(el) {
+          return el.parentElement;
+      },
+      interactive: true,
+      interactiveBorder: 10,
+      theme: 'quarto',
+      placement: 'bottom-start',
+    };
+    if (contentFn) {
+      config.content = contentFn;
+    }
+    if (onTriggerFn) {
+      config.onTrigger = onTriggerFn;
+    }
+    if (onUntriggerFn) {
+      config.onUntrigger = onUntriggerFn;
+    }
+    window.tippy(el, config); 
+  }
+  const noterefs = window.document.querySelectorAll('a[role="doc-noteref"]');
+  for (var i=0; i<noterefs.length; i++) {
+    const ref = noterefs[i];
+    tippyHover(ref, function() {
+      // use id or data attribute instead here
+      let href = ref.getAttribute('data-footnote-href') || ref.getAttribute('href');
+      try { href = new URL(href).hash; } catch {}
+      const id = href.replace(/^#\/?/, "");
+      const note = window.document.getElementById(id);
+      if (note) {
+        return note.innerHTML;
+      } else {
+        return "";
+      }
+    });
+  }
+  const xrefs = window.document.querySelectorAll('a.quarto-xref');
+  const processXRef = (id, note) => {
+    // Strip column container classes
+    const stripColumnClz = (el) => {
+      el.classList.remove("page-full", "page-columns");
+      if (el.children) {
+        for (const child of el.children) {
+          stripColumnClz(child);
+        }
+      }
+    }
+    stripColumnClz(note)
+    if (id === null || id.startsWith('sec-')) {
+      // Special case sections, only their first couple elements
+      const container = document.createElement("div");
+      if (note.children && note.children.length > 2) {
+        container.appendChild(note.children[0].cloneNode(true));
+        for (let i = 1; i < note.children.length; i++) {
+          const child = note.children[i];
+          if (child.tagName === "P" && child.innerText === "") {
+            continue;
+          } else {
+            container.appendChild(child.cloneNode(true));
+            break;
+          }
+        }
+        if (window.Quarto?.typesetMath) {
+          window.Quarto.typesetMath(container);
+        }
+        return container.innerHTML
+      } else {
+        if (window.Quarto?.typesetMath) {
+          window.Quarto.typesetMath(note);
+        }
+        return note.innerHTML;
+      }
+    } else {
+      // Remove any anchor links if they are present
+      const anchorLink = note.querySelector('a.anchorjs-link');
+      if (anchorLink) {
+        anchorLink.remove();
+      }
+      if (window.Quarto?.typesetMath) {
+        window.Quarto.typesetMath(note);
+      }
+      // TODO in 1.5, we should make sure this works without a callout special case
+      if (note.classList.contains("callout")) {
+        return note.outerHTML;
+      } else {
+        return note.innerHTML;
+      }
+    }
+  }
+  for (var i=0; i<xrefs.length; i++) {
+    const xref = xrefs[i];
+    tippyHover(xref, undefined, function(instance) {
+      instance.disable();
+      let url = xref.getAttribute('href');
+      let hash = undefined; 
+      if (url.startsWith('#')) {
+        hash = url;
+      } else {
+        try { hash = new URL(url).hash; } catch {}
+      }
+      if (hash) {
+        const id = hash.replace(/^#\/?/, "");
+        const note = window.document.getElementById(id);
+        if (note !== null) {
+          try {
+            const html = processXRef(id, note.cloneNode(true));
+            instance.setContent(html);
+          } finally {
+            instance.enable();
+            instance.show();
+          }
+        } else {
+          // See if we can fetch this
+          fetch(url.split('#')[0])
+          .then(res => res.text())
+          .then(html => {
+            const parser = new DOMParser();
+            const htmlDoc = parser.parseFromString(html, "text/html");
+            const note = htmlDoc.getElementById(id);
+            if (note !== null) {
+              const html = processXRef(id, note);
+              instance.setContent(html);
+            } 
+          }).finally(() => {
+            instance.enable();
+            instance.show();
+          });
+        }
+      } else {
+        // See if we can fetch a full url (with no hash to target)
+        // This is a special case and we should probably do some content thinning / targeting
+        fetch(url)
+        .then(res => res.text())
+        .then(html => {
+          const parser = new DOMParser();
+          const htmlDoc = parser.parseFromString(html, "text/html");
+          const note = htmlDoc.querySelector('main.content');
+          if (note !== null) {
+            // This should only happen for chapter cross references
+            // (since there is no id in the URL)
+            // remove the first header
+            if (note.children.length > 0 && note.children[0].tagName === "HEADER") {
+              note.children[0].remove();
+            }
+            const html = processXRef(null, note);
+            instance.setContent(html);
+          } 
+        }).finally(() => {
+          instance.enable();
+          instance.show();
+        });
+      }
+    }, function(instance) {
+    });
+  }
+      let selectedAnnoteEl;
+      const selectorForAnnotation = ( cell, annotation) => {
+        let cellAttr = 'data-code-cell="' + cell + '"';
+        let lineAttr = 'data-code-annotation="' +  annotation + '"';
+        const selector = 'span[' + cellAttr + '][' + lineAttr + ']';
+        return selector;
+      }
+      const selectCodeLines = (annoteEl) => {
+        const doc = window.document;
+        const targetCell = annoteEl.getAttribute("data-target-cell");
+        const targetAnnotation = annoteEl.getAttribute("data-target-annotation");
+        const annoteSpan = window.document.querySelector(selectorForAnnotation(targetCell, targetAnnotation));
+        const lines = annoteSpan.getAttribute("data-code-lines").split(",");
+        const lineIds = lines.map((line) => {
+          return targetCell + "-" + line;
+        })
+        let top = null;
+        let height = null;
+        let parent = null;
+        if (lineIds.length > 0) {
+            //compute the position of the single el (top and bottom and make a div)
+            const el = window.document.getElementById(lineIds[0]);
+            top = el.offsetTop;
+            height = el.offsetHeight;
+            parent = el.parentElement.parentElement;
+          if (lineIds.length > 1) {
+            const lastEl = window.document.getElementById(lineIds[lineIds.length - 1]);
+            const bottom = lastEl.offsetTop + lastEl.offsetHeight;
+            height = bottom - top;
+          }
+          if (top !== null && height !== null && parent !== null) {
+            // cook up a div (if necessary) and position it 
+            let div = window.document.getElementById("code-annotation-line-highlight");
+            if (div === null) {
+              div = window.document.createElement("div");
+              div.setAttribute("id", "code-annotation-line-highlight");
+              div.style.position = 'absolute';
+              parent.appendChild(div);
+            }
+            div.style.top = top - 2 + "px";
+            div.style.height = height + 4 + "px";
+            div.style.left = 0;
+            let gutterDiv = window.document.getElementById("code-annotation-line-highlight-gutter");
+            if (gutterDiv === null) {
+              gutterDiv = window.document.createElement("div");
+              gutterDiv.setAttribute("id", "code-annotation-line-highlight-gutter");
+              gutterDiv.style.position = 'absolute';
+              const codeCell = window.document.getElementById(targetCell);
+              const gutter = codeCell.querySelector('.code-annotation-gutter');
+              gutter.appendChild(gutterDiv);
+            }
+            gutterDiv.style.top = top - 2 + "px";
+            gutterDiv.style.height = height + 4 + "px";
+          }
+          selectedAnnoteEl = annoteEl;
+        }
+      };
+      const unselectCodeLines = () => {
+        const elementsIds = ["code-annotation-line-highlight", "code-annotation-line-highlight-gutter"];
+        elementsIds.forEach((elId) => {
+          const div = window.document.getElementById(elId);
+          if (div) {
+            div.remove();
+          }
+        });
+        selectedAnnoteEl = undefined;
+      };
+        // Handle positioning of the toggle
+    window.addEventListener(
+      "resize",
+      throttle(() => {
+        elRect = undefined;
+        if (selectedAnnoteEl) {
+          selectCodeLines(selectedAnnoteEl);
+        }
+      }, 10)
+    );
+    function throttle(fn, ms) {
+    let throttle = false;
+    let timer;
+      return (...args) => {
+        if(!throttle) { // first call gets through
+            fn.apply(this, args);
+            throttle = true;
+        } else { // all the others get throttled
+            if(timer) clearTimeout(timer); // cancel #2
+            timer = setTimeout(() => {
+              fn.apply(this, args);
+              timer = throttle = false;
+            }, ms);
+        }
+      };
+    }
+      // Attach click handler to the DT
+      const annoteDls = window.document.querySelectorAll('dt[data-target-cell]');
+      for (const annoteDlNode of annoteDls) {
+        annoteDlNode.addEventListener('click', (event) => {
+          const clickedEl = event.target;
+          if (clickedEl !== selectedAnnoteEl) {
+            unselectCodeLines();
+            const activeEl = window.document.querySelector('dt[data-target-cell].code-annotation-active');
+            if (activeEl) {
+              activeEl.classList.remove('code-annotation-active');
+            }
+            selectCodeLines(clickedEl);
+            clickedEl.classList.add('code-annotation-active');
+          } else {
+            // Unselect the line
+            unselectCodeLines();
+            clickedEl.classList.remove('code-annotation-active');
+          }
+        });
+      }
+  const findCites = (el) => {
+    const parentEl = el.parentElement;
+    if (parentEl) {
+      const cites = parentEl.dataset.cites;
+      if (cites) {
+        return {
+          el,
+          cites: cites.split(' ')
+        };
+      } else {
+        return findCites(el.parentElement)
+      }
+    } else {
+      return undefined;
+    }
+  };
+  var bibliorefs = window.document.querySelectorAll('a[role="doc-biblioref"]');
+  for (var i=0; i<bibliorefs.length; i++) {
+    const ref = bibliorefs[i];
+    const citeInfo = findCites(ref);
+    if (citeInfo) {
+      tippyHover(citeInfo.el, function() {
+        var popup = window.document.createElement('div');
+        citeInfo.cites.forEach(function(cite) {
+          var citeDiv = window.document.createElement('div');
+          citeDiv.classList.add('hanging-indent');
+          citeDiv.classList.add('csl-entry');
+          var biblioDiv = window.document.getElementById('ref-' + cite);
+          if (biblioDiv) {
+            citeDiv.innerHTML = biblioDiv.innerHTML;
+          }
+          popup.appendChild(citeDiv);
+        });
+        return popup.innerHTML;
+      });
+    }
+  }
+});
+</script>
+<nav class="page-navigation">
+  <div class="nav-page nav-page-previous">
+      <a href="./modelos.html" class="pagination-link" aria-label="Modelos Credit Scoring">
+        <i class="bi bi-arrow-left-short"></i> <span class="nav-page-text"><span class="chapter-number">1</span>&nbsp; <span class="chapter-title">Modelos Credit Scoring</span></span>
+      </a>          
+  </div>
+  <div class="nav-page nav-page-next">
+      <a href="./references.html" class="pagination-link" aria-label="References">
+        <span class="nav-page-text">References</span> <i class="bi bi-arrow-right-short"></i>
+      </a>
+  </div>
+</nav>
+</div> <!-- /content -->
+
+
+
+
+</body></html>
